@@ -1,6 +1,4 @@
 // src/components/sections/Schedule.tsx
-// Section "Programme de la journee" - timeline verticale elegante avec illustration a cote
-
 "use client";
 
 import Image from "next/image";
@@ -27,14 +25,20 @@ const itemVariants = {
   },
 };
 
+// Diamètre du cercle = 56px (w-14) → centre à 28px du bord gauche
+const DOT_SIZE   = "w-14 h-14"; // 56px
+const LINE_LEFT  = "left-[28px]"; // centre exact du cercle
+const LINE_INSET = "translate-x-[-50%]"; // centre la ligne sur le point
+
 export default function Schedule() {
   return (
     <section id="programme-journee" className="section-cream py-20">
       <div className="max-w-7xl mx-auto px-6">
-        <SectionHeading title="Programme de la journee" />
+        <SectionHeading title="Programme de la journée" />
 
         <div className="mt-14 grid md:grid-cols-12 gap-12 items-start">
-          {/* Timeline - 7/12 colonnes */}
+
+          {/* ── Timeline ── */}
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -42,13 +46,18 @@ export default function Schedule() {
             viewport={{ once: true, margin: "-80px" }}
             className="relative md:col-span-7"
           >
-            {/* Ligne verticale continue renforcee */}
-            <div className="absolute top-0 bottom-0 left-[1.35rem] w-[2.5px] bg-brand-purple/25" />
+            {/* Ligne verticale — centrée exactement sur le cercle de 56px */}
+            <div
+              className={[
+                "absolute top-0 bottom-0 w-0.5 bg-brand-purple/20",
+                LINE_LEFT,
+                LINE_INSET,
+              ].join(" ")}
+            />
 
-            {/* Items de la timeline */}
             <div className="flex flex-col">
               {SCHEDULE_ITEMS.map((item, index) => {
-                const Icon = item.icon;
+                const Icon   = item.icon;
                 const isLast = index === SCHEDULE_ITEMS.length - 1;
 
                 return (
@@ -56,31 +65,48 @@ export default function Schedule() {
                     key={item.title}
                     variants={itemVariants}
                     className={[
-                      "relative flex gap-6",
-                      isLast ? "pb-0" : "pb-10",
+                      "relative flex gap-5",
+                      isLast ? "pb-0" : "pb-6",
                     ].join(" ")}
                   >
-                    {/* Cercle icone positionne sur la ligne */}
+                    {/* ── Cercle icône ── */}
                     <div className="relative z-10 shrink-0">
                       <div
                         className={[
-                          "w-11 h-11 rounded-full flex items-center justify-center shadow-sm",
+                          DOT_SIZE,
+                          "rounded-full flex items-center justify-center",
+                          "ring-4 ring-white shadow-md",
                           item.accentClass,
                         ].join(" ")}
                       >
-                        <Icon className="w-5 h-5 text-white" />
+                        <Icon className="w-6 h-6 text-white" strokeWidth={1.8} />
                       </div>
                     </div>
 
-                    {/* Contenu de l'etape */}
-                    <div className="pt-1 pb-2 flex flex-col gap-2">
-                      {/* Badge horaire */}
-                      <span className="inline-flex w-fit items-center bg-brand-purple-soft text-brand-purple text-xs font-semibold px-3 py-1 rounded-full">
+                    {/* ── Carte contenu ── */}
+                    <div
+                      className={[
+                        "flex-1 bg-white rounded-xl p-5",
+                        "shadow-sm border border-slate-100",
+                        "flex flex-col gap-2",
+                        // Alignement vertical : on centre la carte sur le cercle
+                        "mt-1",
+                      ].join(" ")}
+                    >
+                      {/* Badge horaire — mis en avant */}
+                      <span
+                        className={[
+                          "inline-flex w-fit items-center",
+                          "bg-brand-purple-soft text-brand-purple",
+                          "text-xs font-bold tracking-wide uppercase",
+                          "px-3 py-1 rounded-full",
+                        ].join(" ")}
+                      >
                         {item.time}
                       </span>
 
                       {/* Titre */}
-                      <h3 className="text-brand-navy font-bold text-lg leading-snug">
+                      <h3 className="text-brand-navy font-bold text-base leading-snug">
                         {item.title}
                       </h3>
 
@@ -97,7 +123,7 @@ export default function Schedule() {
             </div>
           </motion.div>
 
-          {/* Image d'illustration collante (sticky) - 5/12 colonnes */}
+          {/* ── Image sticky ── */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -115,6 +141,7 @@ export default function Schedule() {
               />
             </div>
           </motion.div>
+
         </div>
       </div>
     </section>
