@@ -10,17 +10,15 @@ import {
   Instagram,
   Youtube,
   Heart,
-} from "lucide-react";
-import { EVENT_INFO, CONTACT_INFO } from "@/lib/constants";
+} from 'lucide-react';
+import { EVENT_INFO, CONTACT_INFO } from '@/lib/constants';
 
 export default function Footer() {
   return (
     <footer className="section-navy pt-16 pb-8">
-      <div className="max-w-6xl mx-auto px-6">
-
+      <div className="max-w-7xl mx-auto px-6">
         {/* Grille 4 colonnes */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
-
           {/* Colonne 1 - A propos */}
           <div className="flex flex-col gap-4">
             <h3 className="text-white font-bold text-lg tracking-tight">
@@ -123,8 +121,8 @@ export default function Footer() {
             <div
               className="w-full max-w-45 rounded-2xl p-6 flex flex-col items-center gap-3"
               style={{
-                backgroundColor: "rgba(255,255,255,0.07)",
-                border: "1px solid rgba(255,255,255,0.12)",
+                backgroundColor: 'rgba(255,255,255,0.07)',
+                border: '1px solid rgba(255,255,255,0.12)',
               }}
             >
               <Heart className="w-12 h-12 text-brand-gold" />

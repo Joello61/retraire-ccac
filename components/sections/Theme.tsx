@@ -72,6 +72,7 @@ export default function Theme() {
               src="/images/famille.jpg"
               alt="Famille en priere"
               fill
+              priority
               className="object-cover object-center"
               sizes="(max-width: 768px) 100vw, 768px"
             />

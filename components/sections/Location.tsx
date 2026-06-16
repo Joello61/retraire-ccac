@@ -29,6 +29,10 @@ const fadeInUp = {
 };
 
 export default function Location() {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const address = process.env.NEXT_PUBLIC_EVENT_LOCATION;
+  const showMap = !!apiKey && !!address;
+
   return (
     <section id="lieu" className="section-light py-20">
       <div className="max-w-4xl mx-auto px-6">
@@ -43,14 +47,14 @@ export default function Location() {
             <SectionHeading title="Lieu de l'evenement" />
           </motion.div>
 
-          {/* Message adresse a confirmer */}
+          {/* Message adresse dynamique */}
           <motion.div
             variants={fadeInUp}
             className="mt-6 flex items-center justify-center gap-2"
           >
             <MapPin className="w-4 h-4 text-brand-purple shrink-0" />
             <p className="text-brand-gray text-sm">
-              L&apos;adresse exacte sera communiquee ulterieurement
+              {showMap ? address : "L'adresse exacte sera communiquee ulterieurement"}
             </p>
           </motion.div>
 
@@ -59,31 +63,29 @@ export default function Location() {
             variants={fadeInUp}
             className="mt-10 rounded-2xl overflow-hidden shadow-md"
           >
-            {/* --- Decommenter ce bloc quand l'adresse est disponible ---
-
-            <iframe
-              src="VOTRE_URL_MAPS_ICI"
-              width="100%"
-              height="400"
-              style={{ border: 0 }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Lieu de l'evenement"
-              className="w-full h-80 md:h-96"
-            />
-
-            --------------------------------------------------------- */}
-
-            {/* Placeholder carte */}
-            <div className="w-full h-80 md:h-96 bg-brand-gray-light flex flex-col items-center justify-center gap-4">
-              <div className="w-14 h-14 rounded-full bg-brand-purple-soft flex items-center justify-center">
-                <MapPin className="w-7 h-7 text-brand-purple" />
+            {showMap ? (
+              <iframe
+                src={`https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(address)}&maptype=satellite`}
+                width="100%"
+                height="400"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Lieu de l'evenement"
+                className="w-full h-80 md:h-96"
+              />
+            ) : (
+              /* Placeholder carte si variables d'environnement non definies */
+              <div className="w-full h-80 md:h-96 bg-brand-gray-light flex flex-col items-center justify-center gap-4">
+                <div className="w-14 h-14 rounded-full bg-brand-purple-soft flex items-center justify-center">
+                  <MapPin className="w-7 h-7 text-brand-purple" />
+                </div>
+                <p className="text-brand-gray text-sm font-medium">
+                  La carte Google Maps sera disponible prochainement
+                </p>
               </div>
-              <p className="text-brand-gray text-sm font-medium">
-                La carte Google Maps sera disponible prochainement
-              </p>
-            </div>
+            )}
           </motion.div>
         </motion.div>
       </div>

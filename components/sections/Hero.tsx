@@ -44,8 +44,8 @@ export default function Hero() {
         sizes="100vw"
       />
 
-      {/* Overlay navy uni sans degrades */}
-      <div className="absolute inset-0 bg-brand-navy/70" />
+      {/* Overlay brand purple avec opacite de 65% */}
+      <div className="absolute inset-0 bg-brand-purple/65" />
 
       {/* Contenu central */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 py-24 text-center">

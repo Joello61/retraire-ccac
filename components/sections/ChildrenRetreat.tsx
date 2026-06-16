@@ -1,20 +1,20 @@
 // src/components/sections/ChildrenRetreat.tsx
 // Section "Les enfants aussi ont leur retraite !" - texte gauche, grille d'images droite
 
-"use client";
+'use client';
 
-import Image from "next/image";
-import { motion } from "framer-motion";
-import SectionHeading from "@/components/ui/SectionHeading";
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import SectionHeading from '@/components/ui/SectionHeading';
 
 const fadeInLeft = {
   hidden: { opacity: 0, x: -32 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: 'easeOut' } },
 };
 
 const fadeInRight = {
   hidden: { opacity: 0, x: 32 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: 'easeOut' } },
 };
 
 const containerVariants = {
@@ -30,12 +30,12 @@ const containerVariants = {
 export default function ChildrenRetreat() {
   return (
     <section id="enfants" className="section-light py-20">
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-80px" }}
+          viewport={{ once: true, margin: '-80px' }}
           className="grid md:grid-cols-2 gap-14 items-center"
         >
           {/* Texte gauche */}
@@ -65,7 +65,7 @@ export default function ChildrenRetreat() {
           {/* /public/images/enfants-3.jpg - activite de groupe */}
           <motion.div variants={fadeInRight} className="grid grid-cols-2 gap-4">
             {/* Image haut gauche */}
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-md">
+            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-md">
               <Image
                 src="/images/enfants-1.jpg"
                 alt="Enfant en priere"
@@ -76,7 +76,7 @@ export default function ChildrenRetreat() {
             </div>
 
             {/* Image haut droite */}
-            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-md">
+            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-md">
               <Image
                 src="/images/enfants-2.jpg"
                 alt="Enfants joyeux"
