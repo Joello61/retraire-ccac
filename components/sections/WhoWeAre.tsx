@@ -5,7 +5,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Users, Heart, ShieldCheck } from "lucide-react";
+import { Heart, ShieldCheck } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { EVENT_INFO } from "@/lib/constants";
 
@@ -17,11 +17,6 @@ const containerVariants = {
       staggerChildren: 0.15,
     },
   },
-};
-
-const fadeInUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
 const fadeInLeft = {
@@ -87,7 +82,7 @@ export default function WhoWeAre() {
           {/* Colonne image droite */}
           <motion.div
             variants={fadeInRight}
-            className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden shadow-xl"
+            className="relative w-full aspect-16/10 rounded-2xl overflow-hidden shadow-xl"
           >
             <Image
               src="/images/communaute.jpg"
@@ -97,7 +92,7 @@ export default function WhoWeAre() {
               sizes="(max-width: 768px) 100vw, 50vw"
             />
             {/* Overlay dégradé subtil pour la finition */}
-            <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/10 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-brand-navy/10 to-transparent" />
           </motion.div>
         </motion.div>
       </div>

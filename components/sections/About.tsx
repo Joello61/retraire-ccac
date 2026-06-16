@@ -38,7 +38,7 @@ export default function About() {
           {/* Dimensions recommandees : 800x600px, couple en priere */}
           <motion.div
             variants={fadeInLeft}
-            className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden shadow-lg"
+            className="relative w-full aspect-16/10 rounded-2xl overflow-hidden shadow-lg"
           >
             <Image
               src="/images/about.jpg"

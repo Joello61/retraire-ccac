@@ -118,13 +118,7 @@ export default function Footer() {
                  <Image src="/images/logo-ccac.png" alt="Logo CCAC" width={160} height={160} className="object-contain" />
           */}
           <div className="flex flex-col items-center justify-center">
-            <div
-              className="w-full max-w-45 rounded-2xl p-6 flex flex-col items-center gap-3"
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.07)',
-                border: '1px solid rgba(255,255,255,0.12)',
-              }}
-            >
+            <div className="w-full max-w-45 rounded-2xl p-6 flex flex-col items-center gap-3 bg-white/7 border border-white/12">
               <Heart className="w-12 h-12 text-brand-gold" />
               <div className="text-center">
                 <p className="text-white font-bold text-base tracking-tight">

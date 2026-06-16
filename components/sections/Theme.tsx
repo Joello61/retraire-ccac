@@ -28,8 +28,7 @@ export default function Theme() {
   return (
     <section
       id="theme"
-      className="py-20"
-      style={{ backgroundColor: "var(--color-brand-blue)" }}
+      className="py-20 bg-brand-blue"
     >
       <div className="max-w-3xl mx-auto px-6">
         <motion.div

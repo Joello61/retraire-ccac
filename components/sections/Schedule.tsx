@@ -43,10 +43,7 @@ export default function Schedule() {
             className="relative md:col-span-7"
           >
             {/* Ligne verticale continue renforcee */}
-            <div
-              className="absolute top-0 bottom-0 w-[2.5px] bg-brand-purple/25"
-              style={{ left: "1.35rem" }}
-            />
+            <div className="absolute top-0 bottom-0 left-[1.35rem] w-[2.5px] bg-brand-purple/25" />
 
             {/* Items de la timeline */}
             <div className="flex flex-col">
@@ -108,7 +105,7 @@ export default function Schedule() {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="md:col-span-5 md:sticky md:top-24"
           >
-            <div className="relative w-full aspect-[16/10] md:aspect-[3/4] rounded-2xl overflow-hidden shadow-lg">
+            <div className="relative w-full aspect-16/10 md:aspect-3/4 rounded-2xl overflow-hidden shadow-lg">
               <Image
                 src="/images/programme.jpg"
                 alt="Illustration de la retraite"
