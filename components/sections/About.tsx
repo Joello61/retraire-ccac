@@ -26,7 +26,7 @@ const fadeInRight = {
 export default function About() {
   return (
     <section id="a-propos" className="section-beige py-20">
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial="hidden"
           whileInView="visible"

@@ -30,7 +30,7 @@ const itemVariants = {
 export default function Schedule() {
   return (
     <section id="programme-journee" className="section-cream py-20">
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6">
         <SectionHeading title="Programme de la journee" />
 
         <div className="mt-14 grid md:grid-cols-12 gap-12 items-start">

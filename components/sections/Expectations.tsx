@@ -67,7 +67,7 @@ export default function Expectations() {
 
   return (
     <section id="programme" className="section-cream py-20 overflow-hidden">
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6">
         <SectionHeading title="Ce a quoi vous pouvez vous attendre" />
 
         <div className="mt-14 grid md:grid-cols-12 gap-12 items-start">
@@ -116,7 +116,7 @@ export default function Expectations() {
 
           {/* Colonne droite : Image avec overlay au hover (6/12 colonnes) */}
           <div className="md:col-span-6 md:sticky md:top-24 flex flex-col gap-4">
-            <div className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden shadow-xl group cursor-pointer bg-brand-navy">
+            <div className="relative w-full aspect-16/10 rounded-2xl overflow-hidden shadow-xl group cursor-pointer bg-brand-navy">
               {/* Animation de transition d'image */}
               <AnimatePresence mode="wait">
                 <motion.div
@@ -158,7 +158,7 @@ export default function Expectations() {
             </div>
 
             <p className="hidden md:block text-center text-xs text-brand-gray italic">
-              Survolez l'image pour afficher les détails.
+              Survolez l&apos;image pour afficher les détails.
             </p>
           </div>
         </div>
