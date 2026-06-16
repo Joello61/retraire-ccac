@@ -1,15 +1,15 @@
 // app/api/registration/route.ts
-// Route API Next.js pour traiter les inscriptions et envoyer les emails via Resend
+// Route API Next.js pour traiter les inscriptions et envoyer les emails via Mailjet
 
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
+import { Client, SendEmailV3_1 } from "node-mailjet";
 import { render } from "@react-email/render";
 import RegistrationAdmin from "@/components/emails/RegistrationAdmin";
 import RegistrationConfirmation from "@/components/emails/RegistrationConfirmation";
 
-// ---------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 // Types
-// ---------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 
 type AttendanceChoice = "present" | "absent";
 
@@ -25,19 +25,22 @@ interface RegistrationPayload {
   comments?: string;
 }
 
-// ---------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 // Config
-// ---------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 
-const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
+const mailjet = new Client({
+  apiKey: process.env.MJ_APIKEY_PUBLIC!,
+  apiSecret: process.env.MJ_APIKEY_PRIVATE!,
+});
 
 const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "admin@ccac.com";
 const FROM_EMAIL = process.env.NEXT_PUBLIC_FROM_EMAIL ?? "noreply@ccac.com";
 const FROM_NAME = process.env.NEXT_PUBLIC_FROM_NAME ?? "Retraite des Couples CCAC";
 
-// ---------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 // Validation
-// ---------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -47,7 +50,7 @@ function validatePayload(
   body: unknown
 ): { valid: true; data: RegistrationPayload } | { valid: false; error: string } {
   if (!body || typeof body !== "object") {
-    return { valid: false, error: "Corps de la requête invalide." };
+    return { valid: false, error: "Corps de la requete invalide." };
   }
 
   const b = body as Record<string, unknown>;
@@ -61,7 +64,7 @@ function validatePayload(
   }
 
   if (b.attendance !== "present" && b.attendance !== "absent") {
-    return { valid: false, error: "Le champ 'attendance' doit être 'present' ou 'absent'." };
+    return { valid: false, error: "Le champ 'attendance' doit etre 'present' ou 'absent'." };
   }
 
   return {
@@ -80,23 +83,23 @@ function validatePayload(
   };
 }
 
-// ---------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 // POST /api/registration
-// ---------------------------------------------------------------------------
+//-------------------------------------------------------------------------
 
 export async function POST(request: NextRequest) {
-  // -- Parse body --
+  // Parse body
   let body: unknown;
   try {
     body = await request.json();
   } catch {
     return NextResponse.json(
-      { success: false, message: "Impossible de lire le corps de la requête." },
+      { success: false, message: "Impossible de lire le corps de la requete." },
       { status: 400 }
     );
   }
 
-  // -- Validate --
+  // Validate
   const validation = validatePayload(body);
   if (!validation.valid) {
     return NextResponse.json(
@@ -108,7 +111,7 @@ export async function POST(request: NextRequest) {
   const data = validation.data;
   const submittedAt = new Date().toISOString();
 
-  // -- Render emails --
+  // Render emails
   const [adminHtml, confirmationHtml] = await Promise.all([
     render(
       RegistrationAdmin({
@@ -123,62 +126,55 @@ export async function POST(request: NextRequest) {
     ),
   ]);
 
-  // -- Send emails --
+  // Subjects
   const adminSubject =
     data.attendance === "present"
-      ? `✅ Nouvelle inscription - ${data.fullName}`
-      : `❌ Absence signalée - ${data.fullName}`;
+      ? `Nouvelle inscription - ${data.fullName}`
+      : `Absence signalee - ${data.fullName}`;
 
   const confirmationSubject =
     data.attendance === "present"
-      ? "Votre inscription à la Retraite des Couples CCAC est confirmée 🙏"
-      : "Nous avons bien reçu votre réponse - Retraite des Couples CCAC";
+      ? "Votre inscription a la Retraite des Couples CCAC est confirmee"
+      : "Nous avons bien recu votre reponse - Retraite des Couples CCAC";
 
-  const [adminResult, confirmationResult] = await Promise.allSettled([
-    resend.emails.send({
-      from: `${FROM_NAME} <${FROM_EMAIL}>`,
-      to: ADMIN_EMAIL,
-      replyTo: data.email,
-      subject: adminSubject,
-      html: adminHtml,
-    }),
-    resend.emails.send({
-      from: `${FROM_NAME} <${FROM_EMAIL}>`,
-      to: data.email,
-      subject: confirmationSubject,
-      html: confirmationHtml,
-    }),
-  ]);
+  // Send emails via Mailjet
+  const emailBody: SendEmailV3_1.Body = {
+    Messages: [
+      {
+        From: { Email: FROM_EMAIL, Name: FROM_NAME },
+        To: [{ Email: ADMIN_EMAIL }],
+        ReplyTo: { Email: data.email, Name: data.fullName },
+        Subject: adminSubject,
+        HTMLPart: adminHtml,
+      },
+      {
+        From: { Email: FROM_EMAIL, Name: FROM_NAME },
+        To: [{ Email: data.email, Name: data.fullName }],
+        Subject: confirmationSubject,
+        HTMLPart: confirmationHtml,
+      },
+    ],
+  };
 
-  // -- Handle errors --
-  const adminFailed = adminResult.status === "rejected" || adminResult.value.error;
-  const confirmationFailed =
-    confirmationResult.status === "rejected" || confirmationResult.value.error;
-
-  if (adminFailed && confirmationFailed) {
-    console.error("[registration] Admin email error:", adminResult);
-    console.error("[registration] Confirmation email error:", confirmationResult);
+  try {
+    await mailjet
+      .post("send", { version: "v3.1" })
+      .request(emailBody);
+  } catch (err) {
+    console.error("[registration] Mailjet error:", err);
     return NextResponse.json(
       { success: false, message: "Une erreur est survenue lors de l'envoi des emails." },
       { status: 500 }
     );
   }
 
-  // Partial failures: log but don't block the user
-  if (adminFailed) {
-    console.error("[registration] Admin email failed (non-blocking):", adminResult);
-  }
-  if (confirmationFailed) {
-    console.error("[registration] Confirmation email failed (non-blocking):", confirmationResult);
-  }
-
   return NextResponse.json(
-    { success: true, message: "Inscription enregistrée avec succès." },
+    { success: true, message: "Inscription enregistree avec succes." },
     { status: 200 }
   );
 }
 
 // Reject other HTTP methods
 export async function GET() {
-  return NextResponse.json({ message: "Méthode non autorisée." }, { status: 405 });
+  return NextResponse.json({ message: "Methode non autorisee." }, { status: 405 });
 }

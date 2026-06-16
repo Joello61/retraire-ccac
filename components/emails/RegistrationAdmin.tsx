@@ -1,5 +1,5 @@
 // emails/RegistrationAdmin.tsx
-// Email envoyé à l'administrateur lors d'une nouvelle inscription
+// Email envoye a l'administrateur lors d'une nouvelle inscription
 
 import {
   Body,
@@ -30,7 +30,7 @@ interface RegistrationAdminEmailProps {
   participantNames?: string;
   childrenAges?: string;
   comments?: string;
-  submittedAt?: string; // ISO date string
+  submittedAt?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -38,13 +38,13 @@ interface RegistrationAdminEmailProps {
 // ---------------------------------------------------------------------------
 
 function formatDate(iso?: string): string {
-  if (!iso) return new Date().toLocaleDateString("fr-CA", {
-    day: "2-digit", month: "long", year: "numeric",
-    hour: "2-digit", minute: "2-digit",
-  });
-  return new Date(iso).toLocaleDateString("fr-CA", {
-    day: "2-digit", month: "long", year: "numeric",
-    hour: "2-digit", minute: "2-digit",
+  const d = iso ? new Date(iso) : new Date();
+  return d.toLocaleDateString("fr-CA", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
@@ -67,9 +67,7 @@ function InfoRow({ label, value }: { label: string; value?: string }) {
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <Text style={sectionTitleStyle}>{children}</Text>
-  );
+  return <Text style={sectionTitleStyle}>{children}</Text>;
 }
 
 // ---------------------------------------------------------------------------
@@ -89,18 +87,18 @@ export default function RegistrationAdmin({
   submittedAt,
 }: RegistrationAdminEmailProps) {
   const isPresent = attendance === "present";
-  const totalParticipants =
-    isPresent
-      ? (parseInt(adultsCount || "0") || 0) + (parseInt(childrenCount || "0") || 0)
-      : 0;
+  const totalParticipants = isPresent
+    ? (parseInt(adultsCount || "0") || 0) +
+      (parseInt(childrenCount || "0") || 0)
+    : 0;
 
   return (
     <Html lang="fr">
       <Head />
       <Preview>
         {isPresent
-          ? `✅ Nouvelle inscription - ${fullName}`
-          : `❌ Absence signalée - ${fullName}`}
+          ? `Nouvelle inscription : ${fullName}`
+          : `Absence signalée : ${fullName}`}
       </Preview>
 
       <Body style={body}>
@@ -108,63 +106,70 @@ export default function RegistrationAdmin({
 
           {/* Header */}
           <Section style={header}>
-            <Text style={headerEyebrow}>Retraite des Couples · CCAC</Text>
+            <Text style={headerEyebrow}>Retraite des Couples CCAC</Text>
             <Heading style={headerTitle}>
-              {isPresent ? "✅ Nouvelle inscription reçue" : "❌ Absence signalée"}
+              {isPresent ? "Nouvelle inscription reçue" : "Absence signalée"}
             </Heading>
-            <Text style={headerMeta}>
-              Soumis le {formatDate(submittedAt)}
-            </Text>
+            <Text style={headerMeta}>Soumis le {formatDate(submittedAt)}</Text>
           </Section>
 
-          {/* Badge de statut */}
-          <Section style={badgeSection}>
+          {/* Statut */}
+          <Section style={statusBand}>
             <Text
               style={{
-                ...badge,
-                backgroundColor: isPresent ? "#d1fae5" : "#fee2e2",
-                color: isPresent ? "#065f46" : "#991b1b",
-                borderColor: isPresent ? "#6ee7b7" : "#fca5a5",
+                ...statusText,
+                backgroundColor: isPresent ? "#f0fdf4" : "#fef2f2",
+                color: isPresent ? "#166534" : "#991b1b",
+                borderColor: isPresent ? "#bbf7d0" : "#fecaca",
               }}
             >
               {isPresent
-                ? `🎉 Présent(e) - ${totalParticipants} participant${totalParticipants > 1 ? "s" : ""}`
+                ? `Présence confirmée  ${totalParticipants} participant${totalParticipants > 1 ? "s" : ""}`
                 : "Cette personne ne pourra pas assister à l'événement"}
             </Text>
           </Section>
 
-          {/* Informations de contact */}
+          {/* Contact */}
           <Section style={card}>
-            <SectionTitle>👤 Informations de contact</SectionTitle>
+            <SectionTitle>Informations de contact</SectionTitle>
             <Hr style={divider} />
             <InfoRow label="Nom complet" value={fullName} />
             <InfoRow label="Adresse email" value={email} />
             <InfoRow label="Téléphone" value={phone || "Non renseigné"} />
           </Section>
 
-          {/* Détails de participation (présents seulement) */}
+          {/* Participation */}
           {isPresent && (
             <Section style={card}>
-              <SectionTitle>👥 Participation</SectionTitle>
+              <SectionTitle>Participation</SectionTitle>
               <Hr style={divider} />
-              <Row style={{ ...infoRow, marginBottom: 0 }}>
-                <Column style={{ width: "50%", paddingRight: 8 }}>
+
+              <Row>
+                <Column
+                  style={{ width: "50%", paddingRight: 8, verticalAlign: "top" }}
+                >
                   <Section style={statBox}>
-                    <Text style={statNumber}>{adultsCount || "-"}</Text>
-                    <Text style={statLabel}>Adulte{parseInt(adultsCount || "0") > 1 ? "s" : ""}</Text>
+                    <Text style={statNumber}>{adultsCount || "0"}</Text>
+                    <Text style={statLabel}>
+                      {parseInt(adultsCount || "0") > 1 ? "Adultes" : "Adulte"}
+                    </Text>
                   </Section>
                 </Column>
-                <Column style={{ width: "50%", paddingLeft: 8 }}>
+                <Column
+                  style={{ width: "50%", paddingLeft: 8, verticalAlign: "top" }}
+                >
                   <Section style={statBox}>
-                    <Text style={statNumber}>{childrenCount || "-"}</Text>
-                    <Text style={statLabel}>Enfant{parseInt(childrenCount || "0") > 1 ? "s" : ""}</Text>
+                    <Text style={statNumber}>{childrenCount || "0"}</Text>
+                    <Text style={statLabel}>
+                      {parseInt(childrenCount || "0") > 1 ? "Enfants" : "Enfant"}
+                    </Text>
                   </Section>
                 </Column>
               </Row>
 
               {participantNames && (
                 <>
-                  <Hr style={divider} />
+                  <Hr style={{ ...divider, marginTop: 16 }} />
                   <Text style={labelText}>Noms des participants</Text>
                   <Text style={blockText}>{participantNames}</Text>
                 </>
@@ -172,7 +177,7 @@ export default function RegistrationAdmin({
 
               {childrenAges && (
                 <>
-                  <Hr style={divider} />
+                  <Hr style={{ ...divider, marginTop: 16 }} />
                   <Text style={labelText}>Âges des enfants</Text>
                   <Text style={blockText}>{childrenAges}</Text>
                 </>
@@ -183,13 +188,13 @@ export default function RegistrationAdmin({
           {/* Commentaires */}
           {comments && (
             <Section style={card}>
-              <SectionTitle>💬 Commentaires</SectionTitle>
+              <SectionTitle>Commentaires</SectionTitle>
               <Hr style={divider} />
               <Text style={blockText}>{comments}</Text>
             </Section>
           )}
 
-          {/* Action rapide */}
+          {/* Action */}
           <Section style={actionSection}>
             <Text style={actionText}>
               Répondre à{" "}
@@ -202,7 +207,8 @@ export default function RegistrationAdmin({
           {/* Footer */}
           <Section style={footer}>
             <Text style={footerText}>
-              Cet email a été généré automatiquement par le système d&apos;inscription de la Retraite des Couples CCAC.
+              Cet email a été généré automatiquement par le système
+              d&apos;inscription de la Retraite des Couples CCAC.
             </Text>
           </Section>
 
@@ -217,59 +223,58 @@ export default function RegistrationAdmin({
 // ---------------------------------------------------------------------------
 
 const body: React.CSSProperties = {
-  backgroundColor: "#f3ede4",
+  backgroundColor: "#f1f5f9",
   fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
   margin: 0,
-  padding: "32px 0",
+  padding: "32px 16px",
 };
 
 const container: React.CSSProperties = {
   maxWidth: 600,
   margin: "0 auto",
   backgroundColor: "#ffffff",
-  borderRadius: 16,
+  borderRadius: 8,
   overflow: "hidden",
-  border: "1px solid #e2e8f0",
+  border: "1px solid #e5e7eb",
 };
 
 const header: React.CSSProperties = {
   backgroundColor: "#0f172a",
-  padding: "32px 36px 24px",
+  padding: "28px 32px 24px",
 };
 
 const headerEyebrow: React.CSSProperties = {
-  color: "#c9952a",
+  color: "#94a3b8",
   fontSize: 11,
-  fontWeight: 700,
+  fontWeight: 600,
   textTransform: "uppercase",
-  letterSpacing: "0.1em",
+  letterSpacing: "0.08em",
   margin: "0 0 8px",
 };
 
 const headerTitle: React.CSSProperties = {
   color: "#ffffff",
-  fontSize: 22,
+  fontSize: 20,
   fontWeight: 700,
   margin: "0 0 8px",
   lineHeight: 1.3,
 };
 
 const headerMeta: React.CSSProperties = {
-  color: "#94a3b8",
+  color: "#64748b",
   fontSize: 12,
   margin: 0,
 };
 
-const badgeSection: React.CSSProperties = {
-  padding: "16px 36px",
-  backgroundColor: "#faf8f5",
-  borderBottom: "1px solid #e2e8f0",
+const statusBand: React.CSSProperties = {
+  padding: "16px 32px",
+  borderBottom: "1px solid #e5e7eb",
 };
 
-const badge: React.CSSProperties = {
+const statusText: React.CSSProperties = {
   display: "inline-block",
-  padding: "8px 16px",
-  borderRadius: 999,
+  padding: "7px 14px",
+  borderRadius: 4,
   fontSize: 13,
   fontWeight: 600,
   border: "1px solid",
@@ -277,21 +282,21 @@ const badge: React.CSSProperties = {
 };
 
 const card: React.CSSProperties = {
-  padding: "24px 36px",
-  borderBottom: "1px solid #e2e8f0",
+  padding: "22px 32px",
+  borderBottom: "1px solid #e5e7eb",
 };
 
 const sectionTitleStyle: React.CSSProperties = {
-  fontSize: 13,
+  fontSize: 11,
   fontWeight: 700,
-  color: "#1e3a5f",
+  color: "#374151",
   textTransform: "uppercase",
-  letterSpacing: "0.05em",
+  letterSpacing: "0.08em",
   margin: "0 0 12px",
 };
 
 const divider: React.CSSProperties = {
-  borderColor: "#e2e8f0",
+  borderColor: "#e5e7eb",
   margin: "0 0 16px",
 };
 
@@ -300,92 +305,92 @@ const infoRow: React.CSSProperties = {
 };
 
 const labelCol: React.CSSProperties = {
-  width: "38%",
+  width: "36%",
   verticalAlign: "top",
   paddingRight: 12,
 };
 
 const valueCol: React.CSSProperties = {
-  width: "62%",
+  width: "64%",
   verticalAlign: "top",
 };
 
 const labelText: React.CSSProperties = {
-  fontSize: 12,
+  fontSize: 11,
   fontWeight: 600,
-  color: "#64748b",
+  color: "#9ca3af",
   margin: 0,
   textTransform: "uppercase",
-  letterSpacing: "0.04em",
+  letterSpacing: "0.06em",
 };
 
 const valueText: React.CSSProperties = {
   fontSize: 14,
-  color: "#0f172a",
+  color: "#111827",
   margin: 0,
   fontWeight: 500,
 };
 
-const blockText: React.CSSProperties = {
-  fontSize: 14,
-  color: "#0f172a",
-  margin: "8px 0 0",
-  lineHeight: 1.6,
-  backgroundColor: "#f8fafc",
-  padding: "12px 14px",
-  borderRadius: 8,
-  border: "1px solid #e2e8f0",
-};
-
 const statBox: React.CSSProperties = {
-  backgroundColor: "#f8fafc",
-  border: "1px solid #e2e8f0",
-  borderRadius: 10,
-  padding: "14px 16px",
+  backgroundColor: "#f9fafb",
+  border: "1px solid #e5e7eb",
+  borderRadius: 6,
+  padding: "14px 12px",
   textAlign: "center",
-  margin: "12px 0 0",
+  marginTop: 0,
 };
 
 const statNumber: React.CSSProperties = {
-  fontSize: 28,
+  fontSize: 26,
   fontWeight: 700,
-  color: "#1e3a5f",
+  color: "#111827",
   margin: "0 0 2px",
   lineHeight: 1,
 };
 
 const statLabel: React.CSSProperties = {
   fontSize: 12,
-  color: "#64748b",
+  color: "#6b7280",
   margin: 0,
   fontWeight: 500,
 };
 
+const blockText: React.CSSProperties = {
+  fontSize: 14,
+  color: "#111827",
+  margin: "8px 0 0",
+  lineHeight: 1.6,
+  backgroundColor: "#f9fafb",
+  padding: "10px 12px",
+  borderRadius: 6,
+  border: "1px solid #e5e7eb",
+};
+
 const actionSection: React.CSSProperties = {
-  padding: "20px 36px",
-  backgroundColor: "#f0f9ff",
-  borderBottom: "1px solid #e2e8f0",
+  padding: "18px 32px",
+  backgroundColor: "#f8fafc",
+  borderBottom: "1px solid #e5e7eb",
 };
 
 const actionText: React.CSSProperties = {
   fontSize: 13,
-  color: "#0f172a",
+  color: "#374151",
   margin: 0,
 };
 
 const link: React.CSSProperties = {
   color: "#1e3a5f",
   fontWeight: 600,
+  textDecoration: "underline",
 };
 
 const footer: React.CSSProperties = {
-  padding: "20px 36px",
-  backgroundColor: "#f8fafc",
+  padding: "18px 32px",
 };
 
 const footerText: React.CSSProperties = {
   fontSize: 11,
-  color: "#94a3b8",
+  color: "#9ca3af",
   margin: 0,
   textAlign: "center",
   lineHeight: 1.6,
