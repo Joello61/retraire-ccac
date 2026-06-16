@@ -3,21 +3,21 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "Retraite Spirituelle CCAC 2025 - Couples Chretiens & Amis au Canada",
+  title: "Retraite Spirituelle CCAC 2025 - Couples Chrétiens & Amis au Canada",
   description:
-    "Rejoignez-nous pour la Retraite Spirituelle des Couples Chretiens & Amis au Canada. Un temps de ressourcement, de priere et de renouveau pour les couples et leurs familles. 16 aout 2025.",
+    "Rejoignez-nous pour la Retraite Spirituelle des Couples Chrétiens & Amis au Canada. Un temps de ressourcement, de prière et de renouveau pour les couples et leurs familles. 16 août 2025.",
   keywords: [
     "retraite spirituelle",
-    "couples chretiens",
+    "couples chrétiens",
     "CCAC",
     "Canada",
-    "famille chretienne",
+    "famille chrétienne",
     "retraite couples",
   ],
   openGraph: {
     title: "Retraite Spirituelle CCAC 2025",
     description:
-      "Un temps de ressourcement, de priere et de renouveau pour les couples et leurs familles.",
+      "Un temps de ressourcement, de prière et de renouveau pour les couples et leurs familles.",
     type: "website",
     locale: "fr_CA",
   },

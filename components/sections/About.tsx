@@ -42,7 +42,7 @@ export default function About() {
           >
             <Image
               src="/images/about.jpg"
-              alt="Couple en priere"
+              alt="Couple en prière"
               fill
               className="object-cover object-center"
               sizes="(max-width: 768px) 100vw, 50vw"
@@ -55,12 +55,12 @@ export default function About() {
             className="flex flex-col gap-6"
           >
             <SectionHeading
-              title="Rejoignez-nous pour une retraite de couple centree sur Christ"
+              title="Rejoignez-nous pour une retraite de couple centrée sur Christ"
               centered={false}
             />
 
             <p className="text-brand-gray leading-relaxed">
-              Cette retraite spirituelle est organisee par le{" "}
+              Cette retraite spirituelle est organisée par le{" "}
               <strong className="text-brand-navy">
                 {EVENT_INFO.organizerName} ({EVENT_INFO.organizerFullName})
               </strong>
@@ -68,14 +68,14 @@ export default function About() {
             </p>
 
             <p className="text-brand-gray leading-relaxed">
-              Nous croyons qu&apos;un couple solide contribue a batir une famille
-              equilibree et epanouie. A travers nos rencontres et activites,
+              Nous croyons qu&apos;un couple solide contribue à bâtir une famille
+              équilibrée et épanouie. À travers nos rencontres et activités,
               nous accompagnons les couples dans leur croissance spirituelle,
               relationnelle et familiale.
             </p>
 
             <p className="text-brand-gray leading-relaxed">
-              Nous esperons que vous vivrez cette retraite comme un veritable
+              Nous espérons que vous vivrez cette retraite comme un véritable
               moment de ressourcement.
             </p>
 

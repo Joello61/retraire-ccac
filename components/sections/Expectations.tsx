@@ -68,7 +68,7 @@ export default function Expectations() {
   return (
     <section id="programme" className="section-cream py-20 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
-        <SectionHeading title="Ce a quoi vous pouvez vous attendre" />
+        <SectionHeading title="Ce à quoi vous pouvez vous attendre" />
 
         <div className="mt-14 grid md:grid-cols-12 gap-12 items-start">
           {/* Colonne gauche : Liste interactive (6/12 colonnes, grille interne de 2 colonnes) */}

@@ -26,8 +26,8 @@ export default function VideoShowcase() {
         >
           <motion.div variants={fadeInUp}>
             <SectionHeading
-              title="Decouvrez nos rencontres"
-              subtitle="Decouvrez l'ambiance de nos precedentes rencontres et retraites spirituelles."
+              title="Découvrez nos rencontres"
+              subtitle="Découvrez l'ambiance de nos précédentes rencontres et retraites spirituelles."
             />
           </motion.div>
 
@@ -53,7 +53,7 @@ export default function VideoShowcase() {
                     <Sparkles className="w-7 h-7 text-brand-gold" />
                   </div>
                   <p className="text-white font-bold text-sm leading-snug">
-                    Video de la retraite
+                    Vidéo de la retraite
                   </p>
                   <p className="text-white/60 text-xs">Format vertical 9:16</p>
                   <p className="text-brand-gold text-xs leading-snug">

@@ -47,14 +47,14 @@ export default function ChildrenRetreat() {
 
             <p className="text-brand-gray leading-relaxed">
               Pendant que les parents vivent leur retraite spirituelle, un
-              programme specialement concu pour les enfants se deroule en
-              parallele.
+              programme spécialement conçu pour les enfants se déroule en
+              parallèle.
             </p>
 
             <p className="text-brand-gray leading-relaxed">
-              Anime par une equipe devouee et experimentee, ce moment offre aux
-              enfants un espace securitaire et stimulant pour decouvrir les
-              valeurs chretiennes de maniere adaptee a leur age.
+              Animé par une équipe dévouée et expérimentée, ce moment offre aux
+              enfants un espace sécuritaire et stimulant pour découvrir les
+              valeurs chrétiennes de manière adaptée à leur âge.
             </p>
           </motion.div>
 
@@ -90,7 +90,7 @@ export default function ChildrenRetreat() {
             <div className="col-span-2 relative aspect-[16/7] rounded-2xl overflow-hidden shadow-md">
               <Image
                 src="/images/enfants-3.jpg"
-                alt="Activite de groupe pour enfants"
+                alt="Activité de groupe pour enfants"
                 fill
                 className="object-cover object-center"
                 sizes="(max-width: 768px) 100vw, 50vw"

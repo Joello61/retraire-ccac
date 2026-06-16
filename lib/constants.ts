@@ -25,18 +25,18 @@ import {
 
 export const EVENT_INFO = {
   title: "Retraite Spirituelle",
-  subtitle: "Couples Chretiens & Amis au Canada",
-  tagline: "Un temps de ressourcement, de priere et de renouveau pour les couples et leurs familles.",
-  date: "16 aout 2025",
-  schedule: "8h00 a 18h00",
+  subtitle: "Couples Chrétiens & Amis au Canada",
+  tagline: "Un temps de ressourcement, de prière et de renouveau pour les couples et leurs familles.",
+  date: "16 août 2025",
+  schedule: "8h00 à 18h00",
   isFree: true,
   freeBadge: "Participation gratuite",
-  slogan: "Un couple solide, une famille equilibree.",
-  verse: "Moi et ma famille, nous servirons l'Eternel",
-  verseRef: "Josue 24:14-15",
-  themeTitle: "Consecration des familles",
+  slogan: "Un couple solide, une famille équilibrée.",
+  verse: "Moi et ma famille, nous servirons l'Éternel",
+  verseRef: "Josué 24:14-15",
+  themeTitle: "Consécration des familles",
   organizerName: "CCAC",
-  organizerFullName: "Couples Chretiens & Amis au Canada",
+  organizerFullName: "Couples Chrétiens & Amis au Canada",
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -71,7 +71,7 @@ export const EXPECTATION_CARDS: ExpectationCard[] = [
   },
   {
     icon: HandHeart,
-    label: "Temps de priere",
+    label: "Temps de prière",
     colorClass: "text-pink-500",
     bgClass: "bg-pink-50",
   },
@@ -89,19 +89,19 @@ export const EXPECTATION_CARDS: ExpectationCard[] = [
   },
   {
     icon: Users,
-    label: "Echanges fraternels",
+    label: "Échanges fraternels",
     colorClass: "text-emerald-600",
     bgClass: "bg-emerald-50",
   },
   {
     icon: Baby,
-    label: "Activites pour enfants",
+    label: "Activités pour enfants",
     colorClass: "text-sky-500",
     bgClass: "bg-sky-50",
   },
   {
     icon: UtensilsCrossed,
-    label: "Repas partage",
+    label: "Repas partagé",
     colorClass: "text-orange-500",
     bgClass: "bg-orange-50",
   },
@@ -130,14 +130,14 @@ export const SCHEDULE_ITEMS: ScheduleItem[] = [
     icon: Home,
     time: "8h00 - 10h30",
     title: "Accueil & Salutations",
-    description: "Adoration, priere & mot de bienvenue",
+    description: "Adoration, prière & mot de bienvenue",
     accentClass: "bg-brand-purple",
   },
   {
     icon: BookOpen,
     time: "10h30 - 11h00",
-    title: "Meditation biblique",
-    description: "Moment d'etude et d'echange biblique",
+    title: "Méditation biblique",
+    description: "Moment d'étude et d'échange biblique",
     accentClass: "bg-brand-sky",
   },
   {
@@ -145,7 +145,7 @@ export const SCHEDULE_ITEMS: ScheduleItem[] = [
     time: "11h30 - 15h00",
     title: "Enseignement",
     description:
-      "Partage autour de la thematique de la retraite : Moi et ma famille nous servirons l'Eternel",
+      "Partage autour de la thématique de la retraite : Moi et ma famille nous servirons l'Éternel",
     accentClass: "bg-brand-gold",
   },
   {
@@ -169,7 +169,7 @@ export const SCHEDULE_ITEMS: ScheduleItem[] = [
   {
     icon: Star,
     time: "17h30 - 18h00",
-    title: "Conclusion & prieres",
+    title: "Conclusion & prières",
     accentClass: "bg-brand-sky",
   },
 ];
@@ -198,7 +198,7 @@ export const CONTACT_CARDS: ContactCard[] = [
   },
   {
     icon: Phone,
-    label: "Telephone 1",
+    label: "Téléphone 1",
     value: CONTACT_INFO.phone1,
     href: `tel:${CONTACT_INFO.phone1Raw}`,
     iconColorClass: "text-pink-500",
@@ -206,7 +206,7 @@ export const CONTACT_CARDS: ContactCard[] = [
   },
   {
     icon: Phone,
-    label: "Telephone 2",
+    label: "Téléphone 2",
     value: CONTACT_INFO.phone2,
     href: `tel:${CONTACT_INFO.phone2Raw}`,
     iconColorClass: "text-brand-gold",

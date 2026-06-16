@@ -1,6 +1,6 @@
 // src/components/sections/Registration.tsx
 // Section "Inscription" - formulaire complet avec gestion d'etat React
-// Pret a etre connecte a un service d'email (Resend, EmailJS, Formspree, etc.)
+// Connecté à /api/registration via Resend
 
 "use client";
 
@@ -106,6 +106,7 @@ const stepVariants = {
 export default function Registration() {
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [status, setStatus] = useState<SubmitStatus>("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState<"next" | "back">("next");
 
@@ -123,7 +124,6 @@ export default function Registration() {
   function handleNext() {
     if (step === 1 && isStep1Valid) {
       setDirection("next");
-      // If absent, skip step 2 and go straight to step 3
       if (form.attendance === "absent") {
         setStep(3);
       } else {
@@ -137,7 +137,6 @@ export default function Registration() {
 
   function handleBack() {
     setDirection("back");
-    // If we are on step 3 and user is absent, go back to step 1
     if (step === 3 && form.attendance === "absent") {
       setStep(1);
     } else if (step === 3) {
@@ -151,16 +150,30 @@ export default function Registration() {
     if (!form.fullName || !form.email || !form.attendance) return;
 
     setStatus("loading");
+    setErrorMessage("");
 
-    // --- Connecter ici votre service d'email ---
-    // Exemple avec Formspree : fetch("https://formspree.io/f/VOTRE_ID", { method: "POST", body: JSON.stringify(form) })
-    // Exemple avec EmailJS  : emailjs.send("SERVICE_ID", "TEMPLATE_ID", form)
-    // Exemple avec Resend   : fetch("/api/contact", { method: "POST", body: JSON.stringify(form) })
-    // ------------------------------------------
+    try {
+      const response = await fetch("/api/registration", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    // Simulation temporaire (a retirer lors de l'integration)
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setStatus("success");
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message ?? "Une erreur est survenue.");
+      }
+
+      setStatus("success");
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Une erreur est survenue. Veuillez réessayer.";
+      setErrorMessage(message);
+      setStatus("error");
+    }
   }
 
   // Validation
@@ -184,7 +197,7 @@ export default function Registration() {
   } else if (step === 2) {
     currentStepDisplay = 2;
     progressWidth = "66.66%";
-    stepTitle = "Details de la participation";
+    stepTitle = "Détails de la participation";
   } else if (step === 3) {
     currentStepDisplay = totalSteps;
     progressWidth = "100%";
@@ -194,11 +207,11 @@ export default function Registration() {
   return (
     <section id="inscription" className="section-beige py-20">
       <div className="max-w-7xl mx-auto px-6">
-        <SectionHeading title="S'inscrire a la retraite" />
+        <SectionHeading title="S'inscrire à la retraite" />
 
         {/* Grille principale : Form a gauche, Image/Info a droite */}
         <div className="mt-12 grid md:grid-cols-12 gap-8 lg:gap-12 items-start">
-          
+
           {/* Colonne gauche : Formulaire ou Message de succes */}
           <div className="md:col-span-7 bg-white rounded-2xl border border-brand-border p-6 md:p-8 shadow-sm min-h-115 flex flex-col">
             {status === "success" ? (
@@ -213,17 +226,18 @@ export default function Registration() {
                 </div>
                 <div className="flex flex-col gap-2">
                   <h3 className="text-xl font-bold text-brand-navy">
-                    Inscription envoyee !
+                    Inscription envoyée !
                   </h3>
                   <p className="text-brand-gray text-sm leading-relaxed max-w-md">
-                    Merci <strong className="text-brand-navy">{form.fullName}</strong>. Votre inscription a bien ete recue. Nous
-                    vous contacterons prochainement avec les details de l&apos;evenement.
+                    Merci <strong className="text-brand-navy">{form.fullName}</strong>. Votre inscription a bien été reçue. Nous
+                    vous contacterons prochainement avec les détails de l&apos;événement.
                   </p>
                 </div>
                 <button
                   onClick={() => {
                     setForm(INITIAL_FORM);
                     setStatus("idle");
+                    setErrorMessage("");
                     setStep(1);
                   }}
                   className="btn-outline px-5 py-2.5 text-sm"
@@ -233,12 +247,12 @@ export default function Registration() {
               </motion.div>
             ) : (
               <div className="flex flex-col flex-1 gap-6">
-                
+
                 {/* Header Etape / Barre de progression */}
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-xs font-bold uppercase tracking-wider text-brand-sky">
-                      Etape {currentStepDisplay} sur {totalSteps}
+                      Étape {currentStepDisplay} sur {totalSteps}
                     </span>
                     <span className="text-sm font-semibold text-brand-navy">
                       {stepTitle}
@@ -252,7 +266,7 @@ export default function Registration() {
                   </div>
                 </div>
 
-                {/* Formulaire anime */}
+                {/* Formulaire animé */}
                 <div className="grow">
                   <AnimatePresence mode="wait" custom={direction}>
                     <motion.div
@@ -266,8 +280,8 @@ export default function Registration() {
                     >
                       {step === 1 && (
                         <>
-                          {/* Choix de presence */}
-                          <Field label="Votre presence" required>
+                          {/* Choix de présence */}
+                          <Field label="Votre présence" required>
                             <div className="flex flex-col sm:flex-row gap-3 mt-1">
                               <button
                                 type="button"
@@ -291,7 +305,7 @@ export default function Registration() {
                                     <span className="w-2 h-2 rounded-full bg-brand-purple" />
                                   )}
                                 </span>
-                                Je serai present(e)
+                                Je serai présent(e)
                               </button>
 
                               <button
@@ -328,7 +342,7 @@ export default function Registration() {
                               name="fullName"
                               value={form.fullName}
                               onChange={handleChange}
-                              placeholder="Votre nom et prenom"
+                              placeholder="Votre nom et prénom"
                               className={inputClass}
                             />
                           </Field>
@@ -346,7 +360,7 @@ export default function Registration() {
                               />
                             </Field>
 
-                            <Field label="Telephone">
+                            <Field label="Téléphone">
                               <input
                                 type="tel"
                                 name="phone"
@@ -401,8 +415,8 @@ export default function Registration() {
                             />
                           </Field>
 
-                          {/* Ages des enfants */}
-                          <Field label="Ages des enfants">
+                          {/* Âges des enfants */}
+                          <Field label="Âges des enfants">
                             <textarea
                               name="childrenAges"
                               value={form.childrenAges}
@@ -420,7 +434,7 @@ export default function Registration() {
                           {form.attendance === "absent" && (
                             <div className="bg-brand-gray-light/50 border border-brand-border rounded-xl p-4 text-sm text-brand-gray">
                               <p className="leading-relaxed">
-                                Puisque vous ne pouvez pas assister, vous pouvez laisser un message ou une remarque ci-dessous a l&apos;intention des organisateurs si vous le souhaitez.
+                                Puisque vous ne pouvez pas assister, vous pouvez laisser un message ou une remarque ci-dessous à l&apos;intention des organisateurs si vous le souhaitez.
                               </p>
                             </div>
                           )}
@@ -431,7 +445,7 @@ export default function Registration() {
                               name="comments"
                               value={form.comments}
                               onChange={handleChange}
-                              placeholder="Besoins particuliers, questions, informations supplementaires..."
+                              placeholder="Besoins particuliers, questions, informations supplémentaires..."
                               rows={5}
                               className={textareaClass}
                             />
@@ -448,7 +462,7 @@ export default function Registration() {
                   {status === "error" && (
                     <div className="flex items-center gap-2 text-rose-600 text-xs sm:text-sm mb-4">
                       <AlertCircle className="w-4 h-4 shrink-0" />
-                      Une erreur est survenue. Veuillez reessayer ou nous contacter directement.
+                      {errorMessage || "Une erreur est survenue. Veuillez réessayer ou nous contacter directement."}
                     </div>
                   )}
 
@@ -486,7 +500,7 @@ export default function Registration() {
                           <ArrowLeft className="w-4 h-4" />
                           Retour
                         </button>
-                        
+
                         <button
                           type="button"
                           onClick={handleSubmit}
@@ -529,13 +543,13 @@ export default function Registration() {
             </div>
 
             {/* Boite informative */}
-            <div className="bg-white border-l-4 border-brand-blue rounded-r-xl p-5 shadow-sm border">
+            <div className="bg-white border-l-4 border-brand-blue rounded-r-xl p-5 shadow-sm border border-brand-border/40">
               <div className="flex gap-3">
                 <Info className="w-5 h-5 text-brand-blue shrink-0 mt-0.5" />
                 <div className="flex flex-col gap-1">
                   <h4 className="text-sm font-bold text-brand-navy">Informations importantes</h4>
                   <p className="text-brand-gray text-xs sm:text-sm leading-relaxed">
-                    L&apos;evenement se deroulera de 8h a 18h precises. Veuillez indiquer le nombre de personnes (conjoint, conjointe et enfants) ainsi que les noms de chaque participant et l&apos;age des enfants.
+                    L&apos;événement se déroulera de 8h à 18h précises. Veuillez indiquer le nombre de personnes (conjoint, conjointe et enfants) ainsi que les noms de chaque participant et l&apos;âge des enfants.
                   </p>
                 </div>
               </div>

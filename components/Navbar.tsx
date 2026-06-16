@@ -30,9 +30,9 @@ interface NavLink {
 
 const NAV_LINKS: NavLink[] = [
   { label: "Programme",   href: "#programme",        icon: CalendarDays  },
-  { label: "A propos",    href: "#a-propos",          icon: Heart         },
+  { label: "À propos",    href: "#a-propos",          icon: Heart         },
   { label: "Qui sommes-nous", href: "#qui-sommes-nous", icon: Users       },
-  { label: "Journee",     href: "#programme-journee", icon: BookOpen      },
+  { label: "Journée",     href: "#programme-journee", icon: BookOpen      },
   { label: "Lieu",        href: "#lieu",              icon: MapPin        },
   { label: "Inscription", href: "#inscription",       icon: ClipboardList },
   { label: "Contact",     href: "#contact",           icon: Phone         },

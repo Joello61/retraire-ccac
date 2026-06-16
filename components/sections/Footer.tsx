@@ -97,7 +97,7 @@ export default function Footer() {
           {/* Colonne 3 - Evenement */}
           <div className="flex flex-col gap-4">
             <h3 className="text-white font-bold text-lg tracking-tight">
-              Evenement
+              Événement
             </h3>
             <ul className="flex flex-col gap-3">
               <li className="flex items-center gap-2 text-white/60 text-sm">
@@ -135,7 +135,7 @@ export default function Footer() {
         {/* Ligne copyright */}
         <div className="pt-8 text-center">
           <p className="text-white/40 text-xs">
-            &copy; 2025 {EVENT_INFO.organizerFullName} - Tous droits reserves.
+            &copy; 2025 {EVENT_INFO.organizerFullName} - Tous droits réservés.
           </p>
         </div>
       </div>

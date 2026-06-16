@@ -45,7 +45,7 @@ export default function Hero() {
       />
 
       {/* Overlay brand purple avec opacite de 65% */}
-      <div className="absolute inset-0 bg-brand-purple/65" />
+      <div className="absolute inset-0 bg-brand-blue/70" />
 
       {/* Contenu central */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 py-24 text-center">
@@ -107,10 +107,10 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      {/* Indicateur de defilement */}
+      {/* Indicateur de défilement */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
         <span className="text-white/50 text-xs uppercase tracking-widest">
-          Decouvrir
+          Découvrir
         </span>
         <ChevronDown className="w-5 h-5 text-white/50 animate-bounce" />
       </div>

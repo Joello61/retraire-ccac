@@ -69,7 +69,7 @@ export default function Theme() {
           >
             <Image
               src="/images/famille.jpg"
-              alt="Famille en priere"
+              alt="Famille en prière"
               fill
               priority
               className="object-cover object-center"

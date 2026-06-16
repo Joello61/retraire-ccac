@@ -44,7 +44,7 @@ export default function Location() {
         >
           {/* Titre */}
           <motion.div variants={fadeInUp}>
-            <SectionHeading title="Lieu de l'evenement" />
+            <SectionHeading title="Lieu de l'événement" />
           </motion.div>
 
           {/* Message adresse dynamique */}
@@ -54,7 +54,7 @@ export default function Location() {
           >
             <MapPin className="w-4 h-4 text-brand-purple shrink-0" />
             <p className="text-brand-gray text-sm">
-              {showMap ? address : "L'adresse exacte sera communiquee ulterieurement"}
+              {showMap ? address : "L'adresse exacte sera communiquée ultérieurement"}
             </p>
           </motion.div>
 
@@ -72,7 +72,7 @@ export default function Location() {
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-                title="Lieu de l'evenement"
+                title="Lieu de l'événement"
                 className="w-full h-80 md:h-96"
               />
             ) : (
