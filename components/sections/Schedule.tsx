@@ -25,7 +25,7 @@ const itemVariants = {
   },
 };
 
-// Diamètre du cercle = 56px (w-14) → centre à 28px du bord gauche
+// Diamètre du cercle = 56px (w-14) - centre à 28px du bord gauche
 const DOT_SIZE   = "w-14 h-14"; // 56px
 const LINE_LEFT  = "left-[28px]"; // centre exact du cercle
 const LINE_INSET = "translate-x-[-50%]"; // centre la ligne sur le point
@@ -38,7 +38,7 @@ export default function Schedule() {
 
         <div className="mt-14 grid md:grid-cols-12 gap-12 items-start">
 
-          {/* ── Timeline ── */}
+          {/* Timeline */}
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -46,7 +46,7 @@ export default function Schedule() {
             viewport={{ once: true, margin: "-80px" }}
             className="relative md:col-span-7"
           >
-            {/* Ligne verticale — centrée exactement sur le cercle de 56px */}
+            {/* Ligne verticale - centrée exactement sur le cercle de 56px */}
             <div
               className={[
                 "absolute top-0 bottom-0 w-0.5 bg-brand-purple/20",
@@ -69,7 +69,7 @@ export default function Schedule() {
                       isLast ? "pb-0" : "pb-6",
                     ].join(" ")}
                   >
-                    {/* ── Cercle icône ── */}
+                    {/* Cercle icône */}
                     <div className="relative z-10 shrink-0">
                       <div
                         className={[
@@ -83,7 +83,7 @@ export default function Schedule() {
                       </div>
                     </div>
 
-                    {/* ── Carte contenu ── */}
+                    {/* Carte contenu */}
                     <div
                       className={[
                         "flex-1 bg-white rounded-xl p-5",
@@ -93,7 +93,7 @@ export default function Schedule() {
                         "mt-1",
                       ].join(" ")}
                     >
-                      {/* Badge horaire — mis en avant */}
+                      {/* Badge horaire - mis en avant */}
                       <span
                         className={[
                           "inline-flex w-fit items-center",
@@ -123,7 +123,7 @@ export default function Schedule() {
             </div>
           </motion.div>
 
-          {/* ── Image sticky ── */}
+          {/* Image sticky */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}

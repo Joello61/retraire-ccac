@@ -1,7 +1,7 @@
 # ⛪ Retraite Spirituelle CCAC 2025 - Site Officiel
 
 > **"Un couple solide, une famille équilibrée."**
-> *Thème : Consécration des familles — Josué 24:14-15*
+> *Thème : Consécration des familles - Josué 24:14-15*
 
 Ce projet est le site web officiel de la **Retraite Spirituelle 2025** organisée par le groupe **Couples Chrétiens & Amis au Canada (CCAC)**. L'événement aura lieu le **16 août 2025 de 8h00 à 18h00** et est entièrement gratuit (sur inscription).
 

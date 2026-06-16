@@ -128,7 +128,7 @@ export default function RegistrationAdmin({
               }}
             >
               {isPresent
-                ? `🎉 Présent(e) — ${totalParticipants} participant${totalParticipants > 1 ? "s" : ""}`
+                ? `🎉 Présent(e) - ${totalParticipants} participant${totalParticipants > 1 ? "s" : ""}`
                 : "Cette personne ne pourra pas assister à l'événement"}
             </Text>
           </Section>
