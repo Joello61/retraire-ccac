@@ -36,7 +36,7 @@ export default function Hero() {
       {/* Remplacer par votre image : /public/images/hero.jpg */}
       {/* Dimensions recommandees : 1920x1080px minimum */}
       <Image
-        src="/images/hero.jpg"
+        src="/images/hero.jpeg"
         alt="Retraite Spirituelle CCAC 2025"
         fill
         priority
@@ -45,7 +45,7 @@ export default function Hero() {
       />
 
       {/* Overlay brand purple avec opacite de 65% */}
-      <div className="absolute inset-0 bg-brand-blue/70" />
+      <div className="absolute inset-0 bg-brand-blue/60" />
 
       {/* Contenu central */}
       <div className="relative z-10 max-w-4xl mx-auto px-6 py-24 text-center">

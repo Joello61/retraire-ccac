@@ -543,13 +543,13 @@ export default function Registration() {
             </div>
 
             {/* Boite informative */}
-            <div className="bg-white border-l-4 border-brand-blue rounded-r-xl p-5 shadow-sm border border-brand-border/40">
+            <div className="bg-white border-l-4 border-brand-blue rounded-r-xl p-5 shadow-sm border">
               <div className="flex gap-3">
                 <Info className="w-5 h-5 text-brand-blue shrink-0 mt-0.5" />
                 <div className="flex flex-col gap-1">
                   <h4 className="text-sm font-bold text-brand-navy">Informations importantes</h4>
                   <p className="text-brand-gray text-xs sm:text-sm leading-relaxed">
-                    L&apos;événement se déroulera de 8h à 18h précises. Veuillez indiquer le nombre de personnes (conjoint, conjointe et enfants) ainsi que les noms de chaque participant et l&apos;âge des enfants.
+                    L&apos;événement se déroulera de 8h à 16h précises. Veuillez indiquer le nombre de personnes (conjoint, conjointe et enfants) ainsi que les noms de chaque participant et l&apos;âge des enfants.
                   </p>
                 </div>
               </div>

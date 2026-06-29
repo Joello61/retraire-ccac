@@ -13,35 +13,35 @@ const CARDS_DATA = [
   {
     label: "Enseignements bibliques",
     description: "Approfondissez votre foi avec des partages bibliques concrets axés sur la vie de couple et de famille chrétienne.",
-    image: "/images/programme.jpg",
+    image: "/images/galerie/photo1.jpeg",
   },
   {
-    label: "Temps de priere",
+    label: "Temps de prière",
     description: "Des moments privilégiés pour prier ensemble, élever vos requêtes à Dieu et fortifier la spiritualité de votre foyer.",
     image: "/images/hero.jpg",
   },
   {
     label: "Adoration",
     description: "Célébrez le Seigneur d'un seul cœur à travers des chants de louange et des moments d'intimité spirituelle intense.",
-    image: "/images/adoration.jpg",
+    image: "/images/galerie/photo3.jpeg",
   },
   {
     label: "Ateliers pour couples",
     description: "Participez à des exercices pratiques en tête-à-tête pour améliorer la communication, le pardon et la complicité.",
-    image: "/images/about.jpg",
+    image: "/images/galerie/photo4.jpeg",
   },
   {
-    label: "Echanges fraternels",
+    label: "Échanges fraternels",
     description: "Rencontrez et échangez avec d'autres couples chrétiens du Canada partageant les mêmes défis et aspirations.",
     image: "/images/communaute.jpg",
   },
   {
-    label: "Activites pour enfants",
+    label: "Activités pour enfants",
     description: "Un encadrement complet et sécuritaire avec des jeux éducatifs et des enseignements adaptés pendant que vous vivez votre retraite.",
-    image: "/images/enfants-2.jpg",
+    image: "/images/galerie/photo5.jpeg",
   },
   {
-    label: "Repas partage",
+    label: "Repas partagé",
     description: "Profitez d'un délicieux repas communautaire pour fraterniser en toute simplicité et convivialité.",
     image: "/images/repas.jpg",
   },

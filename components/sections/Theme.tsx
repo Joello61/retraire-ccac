@@ -30,7 +30,7 @@ export default function Theme() {
       id="theme"
       className="py-20 bg-brand-blue"
     >
-      <div className="max-w-3xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-6">
         <motion.div
           variants={containerVariants}
           initial="hidden"
