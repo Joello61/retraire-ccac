@@ -85,7 +85,7 @@ export default function WhoWeAre() {
             className="relative w-full aspect-16/10 rounded-2xl overflow-hidden shadow-xl"
           >
             <Image
-              src="/images/communaute.jpg"
+              src="/images/galerie/photo7.jpeg"
               alt="Notre communauté de couples au Canada"
               fill
               className="object-cover object-center"

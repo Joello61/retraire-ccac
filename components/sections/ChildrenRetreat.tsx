@@ -65,9 +65,9 @@ export default function ChildrenRetreat() {
           {/* /public/images/enfants-3.jpg - activite de groupe */}
           <motion.div variants={fadeInRight} className="grid grid-cols-2 gap-4">
             {/* Image haut gauche */}
-            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-md">
+            <div className="relative aspect-16/10 rounded-2xl overflow-hidden shadow-md">
               <Image
-                src="/images/enfants-1.jpg"
+                src="/images/galerie/photo9.jpeg"
                 alt="Enfant en priere"
                 fill
                 className="object-cover object-center"
@@ -76,9 +76,9 @@ export default function ChildrenRetreat() {
             </div>
 
             {/* Image haut droite */}
-            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden shadow-md">
+            <div className="relative aspect-16/10 rounded-2xl overflow-hidden shadow-md">
               <Image
-                src="/images/enfants-2.jpg"
+                src="/images/galerie/photo5.jpeg"
                 alt="Enfants joyeux"
                 fill
                 className="object-cover object-center"
@@ -87,9 +87,9 @@ export default function ChildrenRetreat() {
             </div>
 
             {/* Image bas - pleine largeur */}
-            <div className="col-span-2 relative aspect-[16/7] rounded-2xl overflow-hidden shadow-md">
+            <div className="col-span-2 relative aspect-16/7 rounded-2xl overflow-hidden shadow-md">
               <Image
-                src="/images/enfants-3.jpg"
+                src="/images/galerie/photo8.jpeg"
                 alt="Activité de groupe pour enfants"
                 fill
                 className="object-cover object-center"

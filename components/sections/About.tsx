@@ -41,7 +41,7 @@ export default function About() {
             className="relative w-full aspect-16/10 rounded-2xl overflow-hidden shadow-lg"
           >
             <Image
-              src="/images/about.jpg"
+              src="/images/galerie/photo1.jpeg"
               alt="Couple en prière"
               fill
               className="object-cover object-center"

@@ -68,7 +68,7 @@ export default function Theme() {
             className="w-full rounded-2xl overflow-hidden shadow-lg aspect-video relative"
           >
             <Image
-              src="/images/famille.jpg"
+              src="/images/galerie/photo8.jpeg"
               alt="Famille en prière"
               fill
               priority

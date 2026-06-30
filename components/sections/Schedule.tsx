@@ -133,7 +133,7 @@ export default function Schedule() {
           >
             <div className="relative w-full aspect-16/10 md:aspect-3/4 rounded-2xl overflow-hidden shadow-lg">
               <Image
-                src="/images/programme.jpg"
+                src="/images/galerie/photo11.jpeg"
                 alt="Illustration de la retraite"
                 fill
                 className="object-cover object-center"

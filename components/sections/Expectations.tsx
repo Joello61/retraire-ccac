@@ -18,7 +18,7 @@ const CARDS_DATA = [
   {
     label: "Temps de prière",
     description: "Des moments privilégiés pour prier ensemble, élever vos requêtes à Dieu et fortifier la spiritualité de votre foyer.",
-    image: "/images/hero.jpg",
+    image: "/images/galerie/photo10.jpeg",
   },
   {
     label: "Adoration",
@@ -33,7 +33,7 @@ const CARDS_DATA = [
   {
     label: "Échanges fraternels",
     description: "Rencontrez et échangez avec d'autres couples chrétiens du Canada partageant les mêmes défis et aspirations.",
-    image: "/images/communaute.jpg",
+    image: "/images/galerie/photo6.jpeg",
   },
   {
     label: "Activités pour enfants",
@@ -43,12 +43,12 @@ const CARDS_DATA = [
   {
     label: "Repas partagé",
     description: "Profitez d'un délicieux repas communautaire pour fraterniser en toute simplicité et convivialité.",
-    image: "/images/repas.jpg",
+    image: "/images/galerie/photo7.jpeg",
   },
   {
     label: "Intercession",
     description: "Un ministère d'accompagnement par la prière pour porter ensemble vos fardeaux et confier vos familles au Seigneur.",
-    image: "/images/famille.jpg",
+    image: "/images/galerie/photo8.jpeg",
   },
 ];
 
