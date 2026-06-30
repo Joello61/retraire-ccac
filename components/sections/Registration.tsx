@@ -533,7 +533,7 @@ export default function Registration() {
             {/* Image paysage 16/10 */}
             <div className="relative w-full aspect-16/10 rounded-2xl overflow-hidden shadow-lg border border-brand-border/40">
               <Image
-                src="/images/hero4.jpeg"
+                src="/images/hero.jpeg"
                 alt="Retraite des couples CCAC"
                 fill
                 className="object-cover object-center"

@@ -170,6 +170,7 @@ export default function Navbar() {
                 fill
                 className="object-contain"
                 sizes="32px"
+                loading='eager'
               />
             </div>
             <span className="font-bold text-brand-navy text-sm leading-tight hidden sm:block">

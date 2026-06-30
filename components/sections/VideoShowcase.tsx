@@ -22,6 +22,15 @@ const photos = [
   '/images/galerie/photo8.jpeg',
   '/images/galerie/photo9.jpeg',
   '/images/galerie/photo10.jpeg',
+  '/images/galerie/photo11.jpeg',
+  '/images/galerie/photo12.jpeg',
+  '/images/galerie/photo13.jpeg',
+  '/images/galerie/photo14.jpeg',
+  '/images/galerie/photo15.jpeg',
+  '/images/galerie/photo16.jpeg',
+  '/images/galerie/photo17.jpeg',
+  '/images/galerie/photo18.jpeg',
+  '/images/galerie/photo19.jpeg',
 ];
 
 export default function VideoShowcase() {
