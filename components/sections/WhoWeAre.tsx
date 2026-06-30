@@ -48,7 +48,7 @@ export default function WhoWeAre() {
             />
 
             <p className="text-brand-gray leading-relaxed text-base">
-              Nous sommes un groupe de couples chrétiens et d&apos;amis vivant au Canada, unis par la foi, l&apos;amour de Dieu et l&apos;amitié fraternelle.
+              Nous sommes un groupe de couples chrétiens et amis vivant au Canada, unis par la foi, l&apos;amour de Dieu et l&apos;amitié fraternelle.
             </p>
 
             <p className="text-brand-gray leading-relaxed text-base">
