@@ -1,6 +1,3 @@
-// emails/RegistrationAdmin.tsx
-// Email envoye a l'administrateur lors d'une nouvelle inscription
-
 import {
   Body,
   Column,
@@ -94,7 +91,16 @@ export default function RegistrationAdmin({
 
   return (
     <Html lang="fr">
-      <Head />
+      <Head>
+        <style>{`
+          @media only screen and (max-width: 600px) {
+            .rc-container { width: 100% !important; border-radius: 0 !important; }
+            .rc-px { padding-left: 20px !important; padding-right: 20px !important; }
+            .rc-stack-col { display: block !important; width: 100% !important; padding: 0 0 12px 0 !important; }
+            .rc-stat-col { display: block !important; width: 100% !important; padding: 0 0 8px 0 !important; }
+          }
+        `}</style>
+      </Head>
       <Preview>
         {isPresent
           ? `Nouvelle inscription : ${fullName}`
@@ -102,10 +108,13 @@ export default function RegistrationAdmin({
       </Preview>
 
       <Body style={body}>
-        <Container style={container}>
+        <Container style={container} className="rc-container">
+
+          {/* Barre d'accent */}
+          <Section style={accentBar} />
 
           {/* Header */}
-          <Section style={header}>
+          <Section style={{ ...header }} className="rc-px">
             <Text style={headerEyebrow}>Retraite des Couples CCAC</Text>
             <Heading style={headerTitle}>
               {isPresent ? "Nouvelle inscription reçue" : "Absence signalée"}
@@ -114,23 +123,17 @@ export default function RegistrationAdmin({
           </Section>
 
           {/* Statut */}
-          <Section style={statusBand}>
-            <Text
-              style={{
-                ...statusText,
-                backgroundColor: isPresent ? "#f0fdf4" : "#fef2f2",
-                color: isPresent ? "#166534" : "#991b1b",
-                borderColor: isPresent ? "#bbf7d0" : "#fecaca",
-              }}
-            >
+          <Section style={statusBand} className="rc-px">
+            <Text style={statusLabel}>Statut</Text>
+            <Text style={statusText}>
               {isPresent
-                ? `Présence confirmée  ${totalParticipants} participant${totalParticipants > 1 ? "s" : ""}`
+                ? `Présence confirmée, ${totalParticipants} participant${totalParticipants > 1 ? "s" : ""}`
                 : "Cette personne ne pourra pas assister à l'événement"}
             </Text>
           </Section>
 
           {/* Contact */}
-          <Section style={card}>
+          <Section style={card} className="rc-px">
             <SectionTitle>Informations de contact</SectionTitle>
             <Hr style={divider} />
             <InfoRow label="Nom complet" value={fullName} />
@@ -140,13 +143,14 @@ export default function RegistrationAdmin({
 
           {/* Participation */}
           {isPresent && (
-            <Section style={card}>
+            <Section style={card} className="rc-px">
               <SectionTitle>Participation</SectionTitle>
               <Hr style={divider} />
 
               <Row>
                 <Column
                   style={{ width: "50%", paddingRight: 8, verticalAlign: "top" }}
+                  className="rc-stat-col"
                 >
                   <Section style={statBox}>
                     <Text style={statNumber}>{adultsCount || "0"}</Text>
@@ -157,6 +161,7 @@ export default function RegistrationAdmin({
                 </Column>
                 <Column
                   style={{ width: "50%", paddingLeft: 8, verticalAlign: "top" }}
+                  className="rc-stat-col"
                 >
                   <Section style={statBox}>
                     <Text style={statNumber}>{childrenCount || "0"}</Text>
@@ -187,7 +192,7 @@ export default function RegistrationAdmin({
 
           {/* Commentaires */}
           {comments && (
-            <Section style={card}>
+            <Section style={card} className="rc-px">
               <SectionTitle>Commentaires</SectionTitle>
               <Hr style={divider} />
               <Text style={blockText}>{comments}</Text>
@@ -195,7 +200,7 @@ export default function RegistrationAdmin({
           )}
 
           {/* Action */}
-          <Section style={actionSection}>
+          <Section style={actionSection} className="rc-px">
             <Text style={actionText}>
               Répondre à{" "}
               <a href={`mailto:${email}`} style={link}>
@@ -205,10 +210,10 @@ export default function RegistrationAdmin({
           </Section>
 
           {/* Footer */}
-          <Section style={footer}>
+          <Section style={footer} className="rc-px">
             <Text style={footerText}>
               Cet email a été généré automatiquement par le système
-              d&apos;inscription de la Retraite des Couples CCAC.
+              d'inscription de la Retraite des Couples CCAC.
             </Text>
           </Section>
 
@@ -223,7 +228,7 @@ export default function RegistrationAdmin({
 // ---------------------------------------------------------------------------
 
 const body: React.CSSProperties = {
-  backgroundColor: "#f1f5f9",
+  backgroundColor: "#f4f4f5",
   fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
   margin: 0,
   padding: "32px 16px",
@@ -231,11 +236,17 @@ const body: React.CSSProperties = {
 
 const container: React.CSSProperties = {
   maxWidth: 600,
+  width: "100%",
   margin: "0 auto",
   backgroundColor: "#ffffff",
   borderRadius: 8,
   overflow: "hidden",
   border: "1px solid #e5e7eb",
+};
+
+const accentBar: React.CSSProperties = {
+  backgroundColor: "#c9952a",
+  height: 4,
 };
 
 const header: React.CSSProperties = {
@@ -261,7 +272,7 @@ const headerTitle: React.CSSProperties = {
 };
 
 const headerMeta: React.CSSProperties = {
-  color: "#64748b",
+  color: "#94a3b8",
   fontSize: 12,
   margin: 0,
 };
@@ -271,13 +282,19 @@ const statusBand: React.CSSProperties = {
   borderBottom: "1px solid #e5e7eb",
 };
 
+const statusLabel: React.CSSProperties = {
+  fontSize: 11,
+  fontWeight: 700,
+  color: "#9ca3af",
+  textTransform: "uppercase",
+  letterSpacing: "0.06em",
+  margin: "0 0 4px",
+};
+
 const statusText: React.CSSProperties = {
-  display: "inline-block",
-  padding: "7px 14px",
-  borderRadius: 4,
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: 600,
-  border: "1px solid",
+  color: "#0f172a",
   margin: 0,
 };
 

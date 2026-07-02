@@ -34,13 +34,10 @@ interface RegistrationConfirmationEmailProps {
 // Sub-components
 // ---------------------------------------------------------------------------
 
-function DetailRow({ icon, label, value }: { icon: string; label: string; value: string }) {
+function DetailRow({ label, value }: { label: string; value: string }) {
   return (
-    <Row style={{ marginBottom: 10 }}>
-      <Column style={{ width: 28, verticalAlign: "top", paddingTop: 1 }}>
-        <Text style={{ margin: 0, fontSize: 14 }}>{icon}</Text>
-      </Column>
-      <Column style={{ verticalAlign: "top" }}>
+    <Row style={{ marginBottom: 12 }}>
+      <Column>
         <Text style={detailLabel}>{label}</Text>
         <Text style={detailValue}>{value}</Text>
       </Column>
@@ -66,27 +63,35 @@ export default function RegistrationConfirmation({
 
   return (
     <Html lang="fr">
-      <Head />
+      <Head>
+        <style>{`
+          @media only screen and (max-width: 600px) {
+            .rc-container { width: 100% !important; border-radius: 0 !important; }
+            .rc-px { padding-left: 20px !important; padding-right: 20px !important; }
+            .rc-card { margin-left: 20px !important; margin-right: 20px !important; }
+          }
+        `}</style>
+      </Head>
       <Preview>
         {isPresent
-          ? `Votre inscription est confirmée, ${firstName} ! À très bientôt 🙏`
+          ? `Votre inscription est confirmée, ${firstName}. À très bientôt.`
           : `Nous avons bien reçu votre réponse, ${firstName}`}
       </Preview>
 
       <Body style={body}>
-        <Container style={container}>
+        <Container style={container} className="rc-container">
 
-          {/* Header avec bande dorée */}
+          {/* Barre d'accent */}
           <Section style={headerAccent} />
-          <Section style={header}>
-            <Text style={eyebrow}>Retraite des Couples · CCAC</Text>
+          <Section style={header} className="rc-px">
+            <Text style={eyebrow}>Retraite des Couples, CCAC</Text>
             <Heading style={headerTitle}>
-              {isPresent ? "Votre inscription est confirmée 🙏" : "Nous avons bien reçu votre réponse"}
+              {isPresent ? "Votre inscription est confirmée" : "Nous avons bien reçu votre réponse"}
             </Heading>
           </Section>
 
           {/* Message d'accueil */}
-          <Section style={greetingSection}>
+          <Section style={greetingSection} className="rc-px">
             <Text style={greetingText}>
               Bonjour <strong>{firstName}</strong>,
             </Text>
@@ -98,23 +103,22 @@ export default function RegistrationConfirmation({
             ) : (
               <Text style={bodyText}>
                 Nous avons bien pris note de votre absence à la <strong>Retraite des Couples CCAC</strong>.
-                Nous comprenons que vous ne pouvez pas être parmi nous cette fois-ci, et nous espérons vous retrouver lors d&apos;un prochain événement.
+                Nous comprenons que vous ne pouvez pas être parmi nous cette fois-ci, et nous espérons vous retrouver lors d'un prochain événement.
               </Text>
             )}
           </Section>
 
           {/* Récapitulatif (présents seulement) */}
           {isPresent && (
-            <Section style={card}>
-              <Text style={cardTitle}>📋 Récapitulatif de votre inscription</Text>
+            <Section style={card} className="rc-card">
+              <Text style={cardTitle}>Récapitulatif de votre inscription</Text>
               <Hr style={divider} />
 
-              <DetailRow icon="👤" label="Nom" value={fullName} />
-              <DetailRow icon="✉️" label="Email" value={email} />
+              <DetailRow label="Nom" value={fullName} />
+              <DetailRow label="Email" value={email} />
 
               {(adultsCount || childrenCount) && (
                 <DetailRow
-                  icon="👥"
                   label="Participants"
                   value={[
                     adultsCount && `${adultsCount} adulte${parseInt(adultsCount) > 1 ? "s" : ""}`,
@@ -126,47 +130,41 @@ export default function RegistrationConfirmation({
               )}
 
               {participantNames && (
-                <DetailRow icon="📝" label="Participants" value={participantNames} />
+                <DetailRow label="Noms des participants" value={participantNames} />
               )}
 
               {comments && (
-                <DetailRow icon="💬" label="Votre message" value={comments} />
+                <DetailRow label="Votre message" value={comments} />
               )}
             </Section>
           )}
 
           {/* Infos pratiques (présents seulement) */}
           {isPresent && (
-            <Section style={infoCard}>
-              <Text style={cardTitle}>📌 Informations pratiques</Text>
+            <Section style={infoCard} className="rc-card">
+              <Text style={cardTitle}>Informations pratiques</Text>
               <Hr style={divider} />
 
               <Row style={{ marginBottom: 14 }}>
-                <Column style={{ width: 28 }}>
-                  <Text style={{ margin: 0, fontSize: 16 }}>🗓️</Text>
-                </Column>
                 <Column>
-                  <Text style={infoItemTitle}>Date & Horaire</Text>
+                  <Text style={infoItemTitle}>Date et horaire</Text>
                   <Text style={infoItemBody}>De 8h00 à 18h00 précises</Text>
                 </Column>
               </Row>
 
               <Row>
-                <Column style={{ width: 28 }}>
-                  <Text style={{ margin: 0, fontSize: 16 }}>📬</Text>
-                </Column>
                 <Column>
-                  <Text style={infoItemTitle}>Questions ?</Text>
+                  <Text style={infoItemTitle}>Questions</Text>
                   <Text style={infoItemBody}>
-                    N&apos;hésitez pas à nous contacter en répondant directement à cet email.
+                    N'hésitez pas à nous contacter en répondant directement à cet email.
                   </Text>
                 </Column>
               </Row>
             </Section>
           )}
 
-          {/* Message d'au revoir */}
-          <Section style={closingSection}>
+          {/* Message de clôture */}
+          <Section style={closingSection} className="rc-px">
             <Text style={bodyText}>
               {isPresent
                 ? "Nous vous enverrons prochainement tous les détails nécessaires pour la retraite. En attendant, n'hésitez pas à nous contacter si vous avez des questions."
@@ -175,19 +173,19 @@ export default function RegistrationConfirmation({
             <Text style={signatureText}>
               Avec joie,
               <br />
-              <strong>L&apos;équipe CCAC</strong>
+              <strong>L'équipe CCAC</strong>
             </Text>
           </Section>
 
           {/* Footer */}
-          <Section style={footer}>
+          <Section style={footer} className="rc-px">
             <Hr style={{ ...divider, marginBottom: 16 }} />
             <Text style={footerText}>
               Cet email de confirmation a été envoyé à <strong>{email}</strong> suite à votre
               inscription sur le site de la Retraite des Couples CCAC.
             </Text>
             <Text style={{ ...footerText, marginTop: 4 }}>
-              Si vous n&apos;êtes pas à l&apos;origine de cette inscription, veuillez ignorer cet email.
+              Si vous n'êtes pas à l'origine de cette inscription, veuillez ignorer cet email.
             </Text>
           </Section>
 
@@ -202,7 +200,7 @@ export default function RegistrationConfirmation({
 // ---------------------------------------------------------------------------
 
 const body: React.CSSProperties = {
-  backgroundColor: "#f3ede4",
+  backgroundColor: "#f4f4f5",
   fontFamily: "'Inter', 'Segoe UI', system-ui, sans-serif",
   margin: 0,
   padding: "32px 0",
@@ -210,6 +208,7 @@ const body: React.CSSProperties = {
 
 const container: React.CSSProperties = {
   maxWidth: 580,
+  width: "100%",
   margin: "0 auto",
   backgroundColor: "#ffffff",
   borderRadius: 16,
@@ -219,7 +218,7 @@ const container: React.CSSProperties = {
 
 const headerAccent: React.CSSProperties = {
   backgroundColor: "#c9952a",
-  height: 5,
+  height: 4,
 };
 
 const header: React.CSSProperties = {
@@ -272,8 +271,8 @@ const card: React.CSSProperties = {
 const infoCard: React.CSSProperties = {
   margin: "0 36px 20px",
   padding: "20px 22px",
-  backgroundColor: "#fffbeb",
-  border: "1px solid #fde68a",
+  backgroundColor: "#f8fafc",
+  border: "1px solid #e2e8f0",
   borderRadius: 12,
 };
 
