@@ -38,7 +38,7 @@ const CARDS_DATA = [
   {
     label: "Activités pour enfants",
     description: "Un encadrement complet et sécuritaire avec des jeux éducatifs et des enseignements adaptés pendant que vous vivez votre retraite.",
-    image: "/images/galerie/photo5.jpeg",
+    image: "/images/galerie/photo12.jpeg",
   },
   {
     label: "Repas partagé",

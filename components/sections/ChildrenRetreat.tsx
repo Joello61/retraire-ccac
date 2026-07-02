@@ -67,7 +67,7 @@ export default function ChildrenRetreat() {
             {/* Image haut gauche */}
             <div className="relative aspect-16/10 rounded-2xl overflow-hidden shadow-md">
               <Image
-                src="/images/galerie/photo9.jpeg"
+                src="/images/galerie/photo12.jpeg"
                 alt="Enfant en priere"
                 fill
                 className="object-cover object-center"
@@ -78,7 +78,7 @@ export default function ChildrenRetreat() {
             {/* Image haut droite */}
             <div className="relative aspect-16/10 rounded-2xl overflow-hidden shadow-md">
               <Image
-                src="/images/galerie/photo5.jpeg"
+                src="/images/galerie/photo14.jpeg"
                 alt="Enfants joyeux"
                 fill
                 className="object-cover object-center"
