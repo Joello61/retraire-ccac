@@ -63,15 +63,7 @@ export default function RegistrationConfirmation({
 
   return (
     <Html lang="fr">
-      <Head>
-        <style>{`
-          @media only screen and (max-width: 600px) {
-            .rc-container { width: 100% !important; border-radius: 0 !important; }
-            .rc-px { padding-left: 20px !important; padding-right: 20px !important; }
-            .rc-card { margin-left: 20px !important; margin-right: 20px !important; }
-          }
-        `}</style>
-      </Head>
+      <Head />
       <Preview>
         {isPresent
           ? `Votre inscription est confirmée, ${firstName}. À très bientôt.`
@@ -79,11 +71,11 @@ export default function RegistrationConfirmation({
       </Preview>
 
       <Body style={body}>
-        <Container style={container} className="rc-container">
+        <Container style={container}>
 
           {/* Barre d'accent */}
           <Section style={headerAccent} />
-          <Section style={header} className="rc-px">
+          <Section style={header}>
             <Text style={eyebrow}>Retraite des Couples, CCAC</Text>
             <Heading style={headerTitle}>
               {isPresent ? "Votre inscription est confirmée" : "Nous avons bien reçu votre réponse"}
@@ -91,7 +83,7 @@ export default function RegistrationConfirmation({
           </Section>
 
           {/* Message d'accueil */}
-          <Section style={greetingSection} className="rc-px">
+          <Section style={greetingSection}>
             <Text style={greetingText}>
               Bonjour <strong>{firstName}</strong>,
             </Text>
@@ -110,61 +102,65 @@ export default function RegistrationConfirmation({
 
           {/* Récapitulatif (présents seulement) */}
           {isPresent && (
-            <Section style={card} className="rc-card">
-              <Text style={cardTitle}>Récapitulatif de votre inscription</Text>
-              <Hr style={divider} />
+            <Section style={cardWrapper}>
+              <Section style={card}>
+                <Text style={cardTitle}>Récapitulatif de votre inscription</Text>
+                <Hr style={divider} />
 
-              <DetailRow label="Nom" value={fullName} />
-              <DetailRow label="Email" value={email} />
+                <DetailRow label="Nom" value={fullName} />
+                <DetailRow label="Email" value={email} />
 
-              {(adultsCount || childrenCount) && (
-                <DetailRow
-                  label="Participants"
-                  value={[
-                    adultsCount && `${adultsCount} adulte${parseInt(adultsCount) > 1 ? "s" : ""}`,
-                    childrenCount && parseInt(childrenCount) > 0 && `${childrenCount} enfant${parseInt(childrenCount) > 1 ? "s" : ""}`,
-                  ]
-                    .filter(Boolean)
-                    .join(", ")}
-                />
-              )}
+                {(adultsCount || childrenCount) && (
+                  <DetailRow
+                    label="Participants"
+                    value={[
+                      adultsCount && `${adultsCount} adulte${parseInt(adultsCount) > 1 ? "s" : ""}`,
+                      childrenCount && parseInt(childrenCount) > 0 && `${childrenCount} enfant${parseInt(childrenCount) > 1 ? "s" : ""}`,
+                    ]
+                      .filter(Boolean)
+                      .join(", ")}
+                  />
+                )}
 
-              {participantNames && (
-                <DetailRow label="Noms des participants" value={participantNames} />
-              )}
+                {participantNames && (
+                  <DetailRow label="Noms des participants" value={participantNames} />
+                )}
 
-              {comments && (
-                <DetailRow label="Votre message" value={comments} />
-              )}
+                {comments && (
+                  <DetailRow label="Votre message" value={comments} />
+                )}
+              </Section>
             </Section>
           )}
 
           {/* Infos pratiques (présents seulement) */}
           {isPresent && (
-            <Section style={infoCard} className="rc-card">
-              <Text style={cardTitle}>Informations pratiques</Text>
-              <Hr style={divider} />
+            <Section style={cardWrapper}>
+              <Section style={infoCard}>
+                <Text style={cardTitle}>Informations pratiques</Text>
+                <Hr style={divider} />
 
-              <Row style={{ marginBottom: 14 }}>
-                <Column>
-                  <Text style={infoItemTitle}>Date et horaire</Text>
-                  <Text style={infoItemBody}>De 8h00 à 18h00 précises</Text>
-                </Column>
-              </Row>
+                <Row style={{ marginBottom: 14 }}>
+                  <Column>
+                    <Text style={infoItemTitle}>Date et horaire</Text>
+                    <Text style={infoItemBody}>De 8h00 à 18h00 précises</Text>
+                  </Column>
+                </Row>
 
-              <Row>
-                <Column>
-                  <Text style={infoItemTitle}>Questions</Text>
-                  <Text style={infoItemBody}>
-                    N'hésitez pas à nous contacter en répondant directement à cet email.
-                  </Text>
-                </Column>
-              </Row>
+                <Row>
+                  <Column>
+                    <Text style={infoItemTitle}>Questions</Text>
+                    <Text style={infoItemBody}>
+                      N'hésitez pas à nous contacter en répondant directement à cet email.
+                    </Text>
+                  </Column>
+                </Row>
+              </Section>
             </Section>
           )}
 
           {/* Message de clôture */}
-          <Section style={closingSection} className="rc-px">
+          <Section style={closingSection}>
             <Text style={bodyText}>
               {isPresent
                 ? "Nous vous enverrons prochainement tous les détails nécessaires pour la retraite. En attendant, n'hésitez pas à nous contacter si vous avez des questions."
@@ -178,7 +174,7 @@ export default function RegistrationConfirmation({
           </Section>
 
           {/* Footer */}
-          <Section style={footer} className="rc-px">
+          <Section style={footer}>
             <Hr style={{ ...divider, marginBottom: 16 }} />
             <Text style={footerText}>
               Cet email de confirmation a été envoyé à <strong>{email}</strong> suite à votre
@@ -260,8 +256,11 @@ const bodyText: React.CSSProperties = {
   margin: "0 0 10px",
 };
 
+const cardWrapper: React.CSSProperties = {
+  padding: "0 36px 20px",
+};
+
 const card: React.CSSProperties = {
-  margin: "0 36px 20px",
   padding: "20px 22px",
   backgroundColor: "#f8fafc",
   border: "1px solid #e2e8f0",
@@ -269,7 +268,6 @@ const card: React.CSSProperties = {
 };
 
 const infoCard: React.CSSProperties = {
-  margin: "0 36px 20px",
   padding: "20px 22px",
   backgroundColor: "#f8fafc",
   border: "1px solid #e2e8f0",

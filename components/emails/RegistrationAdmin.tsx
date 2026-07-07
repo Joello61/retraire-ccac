@@ -1,3 +1,6 @@
+// emails/RegistrationAdmin.tsx
+// Email envoyé à l'administrateur lors d'une nouvelle inscription
+
 import {
   Body,
   Column,
@@ -91,16 +94,7 @@ export default function RegistrationAdmin({
 
   return (
     <Html lang="fr">
-      <Head>
-        <style>{`
-          @media only screen and (max-width: 600px) {
-            .rc-container { width: 100% !important; border-radius: 0 !important; }
-            .rc-px { padding-left: 20px !important; padding-right: 20px !important; }
-            .rc-stack-col { display: block !important; width: 100% !important; padding: 0 0 12px 0 !important; }
-            .rc-stat-col { display: block !important; width: 100% !important; padding: 0 0 8px 0 !important; }
-          }
-        `}</style>
-      </Head>
+      <Head />
       <Preview>
         {isPresent
           ? `Nouvelle inscription : ${fullName}`
@@ -108,13 +102,13 @@ export default function RegistrationAdmin({
       </Preview>
 
       <Body style={body}>
-        <Container style={container} className="rc-container">
+        <Container style={container}>
 
           {/* Barre d'accent */}
           <Section style={accentBar} />
 
           {/* Header */}
-          <Section style={{ ...header }} className="rc-px">
+          <Section style={{ ...header }}>
             <Text style={headerEyebrow}>Retraite des Couples CCAC</Text>
             <Heading style={headerTitle}>
               {isPresent ? "Nouvelle inscription reçue" : "Absence signalée"}
@@ -123,7 +117,7 @@ export default function RegistrationAdmin({
           </Section>
 
           {/* Statut */}
-          <Section style={statusBand} className="rc-px">
+          <Section style={statusBand}>
             <Text style={statusLabel}>Statut</Text>
             <Text style={statusText}>
               {isPresent
@@ -133,7 +127,7 @@ export default function RegistrationAdmin({
           </Section>
 
           {/* Contact */}
-          <Section style={card} className="rc-px">
+          <Section style={card}>
             <SectionTitle>Informations de contact</SectionTitle>
             <Hr style={divider} />
             <InfoRow label="Nom complet" value={fullName} />
@@ -143,14 +137,14 @@ export default function RegistrationAdmin({
 
           {/* Participation */}
           {isPresent && (
-            <Section style={card} className="rc-px">
+            <Section style={card}>
               <SectionTitle>Participation</SectionTitle>
               <Hr style={divider} />
 
               <Row>
                 <Column
                   style={{ width: "50%", paddingRight: 8, verticalAlign: "top" }}
-                  className="rc-stat-col"
+                 
                 >
                   <Section style={statBox}>
                     <Text style={statNumber}>{adultsCount || "0"}</Text>
@@ -161,7 +155,7 @@ export default function RegistrationAdmin({
                 </Column>
                 <Column
                   style={{ width: "50%", paddingLeft: 8, verticalAlign: "top" }}
-                  className="rc-stat-col"
+                 
                 >
                   <Section style={statBox}>
                     <Text style={statNumber}>{childrenCount || "0"}</Text>
@@ -192,7 +186,7 @@ export default function RegistrationAdmin({
 
           {/* Commentaires */}
           {comments && (
-            <Section style={card} className="rc-px">
+            <Section style={card}>
               <SectionTitle>Commentaires</SectionTitle>
               <Hr style={divider} />
               <Text style={blockText}>{comments}</Text>
@@ -200,7 +194,7 @@ export default function RegistrationAdmin({
           )}
 
           {/* Action */}
-          <Section style={actionSection} className="rc-px">
+          <Section style={actionSection}>
             <Text style={actionText}>
               Répondre à{" "}
               <a href={`mailto:${email}`} style={link}>
@@ -210,7 +204,7 @@ export default function RegistrationAdmin({
           </Section>
 
           {/* Footer */}
-          <Section style={footer} className="rc-px">
+          <Section style={footer}>
             <Text style={footerText}>
               Cet email a été généré automatiquement par le système
               d'inscription de la Retraite des Couples CCAC.
