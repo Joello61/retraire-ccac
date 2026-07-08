@@ -20,13 +20,23 @@ import * as React from "react";
 // Types
 // ---------------------------------------------------------------------------
 
+type ParticipantType = "adult" | "child";
+
+interface Participant {
+  type: ParticipantType;
+  firstName: string;
+  lastName: string;
+  age?: string;
+  allergies?: string;
+}
+
 interface RegistrationConfirmationEmailProps {
   fullName: string;
   email: string;
   attendance: "present" | "absent";
   adultsCount?: string;
   childrenCount?: string;
-  participantNames?: string;
+  participants?: Participant[];
   comments?: string;
 }
 
@@ -45,6 +55,25 @@ function DetailRow({ label, value }: { label: string; value: string }) {
   );
 }
 
+function ParticipantLine({ participant }: { participant: Participant }) {
+  const fullName = `${participant.firstName} ${participant.lastName}`.trim();
+  const meta = [
+    participant.type === "child" && participant.age ? `${participant.age} ans` : null,
+    participant.allergies ? `allergies/notes : ${participant.allergies}` : null,
+  ]
+    .filter(Boolean)
+    .join(" - ");
+
+  return (
+    <Row style={{ marginBottom: 8 }}>
+      <Column>
+        <Text style={participantNameText}>{fullName}</Text>
+        {meta && <Text style={participantMetaText}>{meta}</Text>}
+      </Column>
+    </Row>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
@@ -55,11 +84,13 @@ export default function RegistrationConfirmation({
   attendance = "present",
   adultsCount,
   childrenCount,
-  participantNames,
+  participants = [],
   comments,
 }: RegistrationConfirmationEmailProps) {
   const isPresent = attendance === "present";
   const firstName = fullName.split(" ")[0];
+  const adults = participants.filter((p) => p.type === "adult");
+  const children = participants.filter((p) => p.type === "child");
 
   return (
     <Html lang="fr">
@@ -122,12 +153,26 @@ export default function RegistrationConfirmation({
                   />
                 )}
 
-                {participantNames && (
-                  <DetailRow label="Noms des participants" value={participantNames} />
+                {adults.length > 0 && (
+                  <>
+                    <Text style={{ ...detailLabel, marginTop: 8 }}>Adultes</Text>
+                    {adults.map((p, i) => (
+                      <ParticipantLine key={`adult-${i}`} participant={p} />
+                    ))}
+                  </>
+                )}
+
+                {children.length > 0 && (
+                  <>
+                    <Text style={{ ...detailLabel, marginTop: 8 }}>Enfants</Text>
+                    {children.map((p, i) => (
+                      <ParticipantLine key={`child-${i}`} participant={p} />
+                    ))}
+                  </>
                 )}
 
                 {comments && (
-                  <DetailRow label="Votre message" value={comments} />
+                  <DetailRow label="Informations complémentaires" value={comments} />
                 )}
               </Section>
             </Section>
@@ -143,7 +188,7 @@ export default function RegistrationConfirmation({
                 <Row style={{ marginBottom: 14 }}>
                   <Column>
                     <Text style={infoItemTitle}>Date et horaire</Text>
-                    <Text style={infoItemBody}>De 8h00 à 18h00 précises</Text>
+                    <Text style={infoItemBody}>De 8h00 à 16h00 précises</Text>
                   </Column>
                 </Row>
 
@@ -302,6 +347,19 @@ const detailValue: React.CSSProperties = {
   color: "#0f172a",
   margin: 0,
   lineHeight: 1.5,
+};
+
+const participantNameText: React.CSSProperties = {
+  fontSize: 14,
+  color: "#0f172a",
+  margin: 0,
+  fontWeight: 500,
+};
+
+const participantMetaText: React.CSSProperties = {
+  fontSize: 12,
+  color: "#64748b",
+  margin: "1px 0 0",
 };
 
 const infoItemTitle: React.CSSProperties = {

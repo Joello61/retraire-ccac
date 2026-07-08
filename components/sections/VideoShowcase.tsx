@@ -60,7 +60,7 @@ export default function VideoShowcase() {
             variants={fadeInUp}
             className="mt-14 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center"
           >
-            {/* Colonne gauche — Vidéo */}
+            {/* Colonne gauche - Vidéo */}
             <div
               className="relative w-full overflow-hidden rounded-2xl shadow-2xl ring-1 ring-black/10"
               style={{ aspectRatio: '640 / 352' }}
@@ -76,7 +76,7 @@ export default function VideoShowcase() {
               </video>
             </div>
 
-            {/* Colonne droite — Carrousel */}
+            {/* Colonne droite - Carrousel */}
             <div className="flex flex-col gap-4">
               {/* Image + flèches */}
               <div

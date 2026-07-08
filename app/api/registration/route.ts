@@ -12,6 +12,15 @@ import RegistrationConfirmation from "@/components/emails/RegistrationConfirmati
 //-------------------------------------------------------------------------
 
 type AttendanceChoice = "present" | "absent";
+type ParticipantType = "adult" | "child";
+
+interface Participant {
+  type: ParticipantType;
+  firstName: string;
+  lastName: string;
+  age?: string; // uniquement pour les enfants
+  allergies?: string;
+}
 
 interface RegistrationPayload {
   fullName: string;
@@ -20,8 +29,7 @@ interface RegistrationPayload {
   attendance: AttendanceChoice;
   adultsCount?: number;
   childrenCount?: number;
-  participantNames?: string;
-  childrenAges?: string;
+  participants: Participant[];
   comments?: string;
 }
 
@@ -63,6 +71,7 @@ const mailjet = new Client({
 
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT_MAX_REQUESTS = 5;
+const MAX_PARTICIPANTS = 30; // garde-fou anti-abus
 
 const requestLog = new Map<string, number[]>();
 
@@ -108,6 +117,54 @@ function parseCount(value: unknown): number | undefined {
   return Number.isFinite(n) && n >= 0 ? n : undefined;
 }
 
+function validateParticipants(
+  value: unknown
+): { valid: true; data: Participant[] } | { valid: false; error: string } {
+  if (value === undefined) {
+    return { valid: true, data: [] };
+  }
+
+  if (!Array.isArray(value)) {
+    return { valid: false, error: "Le champ 'participants' doit etre une liste." };
+  }
+
+  if (value.length > MAX_PARTICIPANTS) {
+    return { valid: false, error: "Trop de participants declares." };
+  }
+
+  const participants: Participant[] = [];
+
+  for (const raw of value) {
+    if (!raw || typeof raw !== "object") {
+      return { valid: false, error: "Un participant est invalide." };
+    }
+    const p = raw as Record<string, unknown>;
+
+    if (p.type !== "adult" && p.type !== "child") {
+      return { valid: false, error: "Le type d'un participant doit etre 'adult' ou 'child'." };
+    }
+    if (typeof p.firstName !== "string" || p.firstName.trim() === "") {
+      return { valid: false, error: "Le prenom d'un participant est requis." };
+    }
+    if (typeof p.lastName !== "string" || p.lastName.trim() === "") {
+      return { valid: false, error: "Le nom d'un participant est requis." };
+    }
+    if (p.type === "child" && (typeof p.age !== "string" || p.age.trim() === "")) {
+      return { valid: false, error: "L'age est requis pour chaque enfant." };
+    }
+
+    participants.push({
+      type: p.type,
+      firstName: p.firstName.trim(),
+      lastName: p.lastName.trim(),
+      age: typeof p.age === "string" && p.age.trim() !== "" ? p.age.trim() : undefined,
+      allergies: typeof p.allergies === "string" && p.allergies.trim() !== "" ? p.allergies.trim() : undefined,
+    });
+  }
+
+  return { valid: true, data: participants };
+}
+
 function validatePayload(
   body: unknown
 ): { valid: true; data: RegistrationPayload } | { valid: false; error: string } {
@@ -133,6 +190,11 @@ function validatePayload(
     return { valid: false, error: "Le champ 'phone' est invalide." };
   }
 
+  const participantsResult = validateParticipants(b.participants);
+  if (!participantsResult.valid) {
+    return { valid: false, error: participantsResult.error };
+  }
+
   return {
     valid: true,
     data: {
@@ -142,8 +204,7 @@ function validatePayload(
       attendance: b.attendance,
       adultsCount: parseCount(b.adultsCount),
       childrenCount: parseCount(b.childrenCount),
-      participantNames: typeof b.participantNames === "string" ? b.participantNames.trim() : undefined,
-      childrenAges: typeof b.childrenAges === "string" ? b.childrenAges.trim() : undefined,
+      participants: participantsResult.data,
       comments: typeof b.comments === "string" ? b.comments.trim() : undefined,
     },
   };
@@ -153,28 +214,62 @@ function validatePayload(
 // Texte brut (fallback pour clients mail sans HTML)
 //-------------------------------------------------------------------------
 
+function formatParticipantLine(p: Participant): string {
+  const parts = [`${p.firstName} ${p.lastName}`];
+  if (p.type === "child" && p.age) parts.push(`${p.age} ans`);
+  if (p.allergies) parts.push(`allergies/notes: ${p.allergies}`);
+  return parts.join(" - ");
+}
+
 function buildConfirmationText(data: RegistrationPayload): string {
-  return `Bonjour ${data.fullName},
+  const adults = data.participants.filter((p) => p.type === "adult");
+  const children = data.participants.filter((p) => p.type === "child");
 
-Votre reponse a bien ete enregistree pour la Retraite des Couples CCAC.
-Statut: ${data.attendance === "present" ? "Presence confirmee" : "Absence signalee"}
+  const lines = [
+    `Bonjour ${data.fullName},`,
+    "",
+    "Votre reponse a bien ete enregistree pour la Retraite des Couples CCAC.",
+    `Statut: ${data.attendance === "present" ? "Presence confirmee" : "Absence signalee"}`,
+  ];
 
-Merci,
-${FROM_NAME}`;
+  if (adults.length > 0) {
+    lines.push("", "Adultes:", ...adults.map((p) => `- ${formatParticipantLine(p)}`));
+  }
+  if (children.length > 0) {
+    lines.push("", "Enfants:", ...children.map((p) => `- ${formatParticipantLine(p)}`));
+  }
+  if (data.comments) {
+    lines.push("", `Informations complementaires: ${data.comments}`);
+  }
+
+  lines.push("", "Merci,", FROM_NAME);
+  return lines.join("\n");
 }
 
 function buildAdminText(data: RegistrationPayload, submittedAt: string): string {
-  return `Nouvelle reponse recue le ${submittedAt}.
+  const adults = data.participants.filter((p) => p.type === "adult");
+  const children = data.participants.filter((p) => p.type === "child");
 
-Nom: ${data.fullName}
-Email: ${data.email}
-Telephone: ${data.phone ?? "N/A"}
-Presence: ${data.attendance}
-Adultes: ${data.adultsCount ?? "N/A"}
-Enfants: ${data.childrenCount ?? "N/A"}
-Participants: ${data.participantNames ?? "N/A"}
-Ages des enfants: ${data.childrenAges ?? "N/A"}
-Commentaires: ${data.comments ?? "N/A"}`;
+  const lines = [
+    `Nouvelle reponse recue le ${submittedAt}.`,
+    "",
+    `Nom: ${data.fullName}`,
+    `Email: ${data.email}`,
+    `Telephone: ${data.phone ?? "N/A"}`,
+    `Presence: ${data.attendance}`,
+    `Adultes: ${data.adultsCount ?? adults.length}`,
+    `Enfants: ${data.childrenCount ?? children.length}`,
+  ];
+
+  if (adults.length > 0) {
+    lines.push("", "Details adultes:", ...adults.map((p) => `- ${formatParticipantLine(p)}`));
+  }
+  if (children.length > 0) {
+    lines.push("", "Details enfants:", ...children.map((p) => `- ${formatParticipantLine(p)}`));
+  }
+
+  lines.push("", `Informations complementaires: ${data.comments ?? "N/A"}`);
+  return lines.join("\n");
 }
 
 //-------------------------------------------------------------------------

@@ -20,6 +20,16 @@ import * as React from "react";
 // Types
 // ---------------------------------------------------------------------------
 
+type ParticipantType = "adult" | "child";
+
+interface Participant {
+  type: ParticipantType;
+  firstName: string;
+  lastName: string;
+  age?: string;
+  allergies?: string;
+}
+
 interface RegistrationAdminEmailProps {
   fullName: string;
   email: string;
@@ -27,8 +37,7 @@ interface RegistrationAdminEmailProps {
   attendance: "present" | "absent";
   adultsCount?: string;
   childrenCount?: string;
-  participantNames?: string;
-  childrenAges?: string;
+  participants?: Participant[];
   comments?: string;
   submittedAt?: string;
 }
@@ -70,6 +79,25 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return <Text style={sectionTitleStyle}>{children}</Text>;
 }
 
+function ParticipantCard({ participant, index }: { participant: Participant; index: number }) {
+  const fullName = `${participant.firstName} ${participant.lastName}`.trim();
+  return (
+    <Section style={{ ...participantCard, marginTop: index === 0 ? 0 : 10 }}>
+      <Row>
+        <Column>
+          <Text style={participantName}>{fullName}</Text>
+          {participant.type === "child" && participant.age && (
+            <Text style={participantMeta}>Âge : {participant.age} ans</Text>
+          )}
+          {participant.allergies && (
+            <Text style={participantAllergy}>Allergies / notes : {participant.allergies}</Text>
+          )}
+        </Column>
+      </Row>
+    </Section>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
@@ -81,15 +109,16 @@ export default function RegistrationAdmin({
   attendance = "present",
   adultsCount,
   childrenCount,
-  participantNames,
-  childrenAges,
+  participants = [],
   comments,
   submittedAt,
 }: RegistrationAdminEmailProps) {
   const isPresent = attendance === "present";
+  const adults = participants.filter((p) => p.type === "adult");
+  const children = participants.filter((p) => p.type === "child");
   const totalParticipants = isPresent
-    ? (parseInt(adultsCount || "0") || 0) +
-      (parseInt(childrenCount || "0") || 0)
+    ? participants.length ||
+      (parseInt(adultsCount || "0") || 0) + (parseInt(childrenCount || "0") || 0)
     : 0;
 
   return (
@@ -98,7 +127,7 @@ export default function RegistrationAdmin({
       <Preview>
         {isPresent
           ? `Nouvelle inscription : ${fullName}`
-          : `Absence signalée : ${fullName}`}
+          : `Absence signalee : ${fullName}`}
       </Preview>
 
       <Body style={body}>
@@ -135,59 +164,32 @@ export default function RegistrationAdmin({
             <InfoRow label="Téléphone" value={phone || "Non renseigné"} />
           </Section>
 
-          {/* Participation */}
-          {isPresent && (
+          {/* Adultes */}
+          {isPresent && adults.length > 0 && (
             <Section style={card}>
-              <SectionTitle>Participation</SectionTitle>
+              <SectionTitle>Adultes ({adults.length})</SectionTitle>
               <Hr style={divider} />
+              {adults.map((p, i) => (
+                <ParticipantCard key={`adult-${i}`} participant={p} index={i} />
+              ))}
+            </Section>
+          )}
 
-              <Row>
-                <Column
-                  style={{ width: "50%", paddingRight: 8, verticalAlign: "top" }}
-                 
-                >
-                  <Section style={statBox}>
-                    <Text style={statNumber}>{adultsCount || "0"}</Text>
-                    <Text style={statLabel}>
-                      {parseInt(adultsCount || "0") > 1 ? "Adultes" : "Adulte"}
-                    </Text>
-                  </Section>
-                </Column>
-                <Column
-                  style={{ width: "50%", paddingLeft: 8, verticalAlign: "top" }}
-                 
-                >
-                  <Section style={statBox}>
-                    <Text style={statNumber}>{childrenCount || "0"}</Text>
-                    <Text style={statLabel}>
-                      {parseInt(childrenCount || "0") > 1 ? "Enfants" : "Enfant"}
-                    </Text>
-                  </Section>
-                </Column>
-              </Row>
-
-              {participantNames && (
-                <>
-                  <Hr style={{ ...divider, marginTop: 16 }} />
-                  <Text style={labelText}>Noms des participants</Text>
-                  <Text style={blockText}>{participantNames}</Text>
-                </>
-              )}
-
-              {childrenAges && (
-                <>
-                  <Hr style={{ ...divider, marginTop: 16 }} />
-                  <Text style={labelText}>Âges des enfants</Text>
-                  <Text style={blockText}>{childrenAges}</Text>
-                </>
-              )}
+          {/* Enfants */}
+          {isPresent && children.length > 0 && (
+            <Section style={card}>
+              <SectionTitle>Enfants ({children.length})</SectionTitle>
+              <Hr style={divider} />
+              {children.map((p, i) => (
+                <ParticipantCard key={`child-${i}`} participant={p} index={i} />
+              ))}
             </Section>
           )}
 
           {/* Commentaires */}
           {comments && (
             <Section style={card}>
-              <SectionTitle>Commentaires</SectionTitle>
+              <SectionTitle>Informations complémentaires générales</SectionTitle>
               <Hr style={divider} />
               <Text style={blockText}>{comments}</Text>
             </Section>
@@ -342,34 +344,37 @@ const valueText: React.CSSProperties = {
   fontWeight: 500,
 };
 
-const statBox: React.CSSProperties = {
+const participantCard: React.CSSProperties = {
   backgroundColor: "#f9fafb",
   border: "1px solid #e5e7eb",
   borderRadius: 6,
-  padding: "14px 12px",
-  textAlign: "center",
-  marginTop: 0,
+  padding: "12px 14px",
 };
 
-const statNumber: React.CSSProperties = {
-  fontSize: 26,
-  fontWeight: 700,
+const participantName: React.CSSProperties = {
+  fontSize: 14,
+  fontWeight: 600,
   color: "#111827",
   margin: "0 0 2px",
-  lineHeight: 1,
 };
 
-const statLabel: React.CSSProperties = {
+const participantMeta: React.CSSProperties = {
   fontSize: 12,
   color: "#6b7280",
-  margin: 0,
+  margin: "0 0 2px",
+};
+
+const participantAllergy: React.CSSProperties = {
+  fontSize: 12,
+  color: "#b45309",
+  margin: "4px 0 0",
   fontWeight: 500,
 };
 
 const blockText: React.CSSProperties = {
   fontSize: 14,
   color: "#111827",
-  margin: "8px 0 0",
+  margin: 0,
   lineHeight: 1.6,
   backgroundColor: "#f9fafb",
   padding: "10px 12px",

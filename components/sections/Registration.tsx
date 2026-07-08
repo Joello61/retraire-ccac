@@ -1,13 +1,21 @@
 // src/components/sections/Registration.tsx
 // Section "Inscription" - formulaire complet avec gestion d'etat React
-// Connecté à /api/registration via Resend
+// Connecté à /api/registration
+//
+// Parcours :
+//   1) Informations personnelles + présence
+//   2) Nombre d'adultes / d'enfants (uniquement si présent)
+//   3) Un écran par participant (prénom, nom, âge si enfant, allergies)
+//   4) Commentaires globaux
+//
+// Si "absent" : on saute directement de l'étape 1 aux commentaires.
 
 "use client";
 
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, CheckCircle, AlertCircle, Info, ArrowLeft, ArrowRight } from "lucide-react";
+import { Send, CheckCircle, AlertCircle, Info, ArrowLeft, ArrowRight, User, Baby } from "lucide-react";
 import SectionHeading from "@/components/ui/SectionHeading";
 
 // ---------------------------------------------------------------------------
@@ -15,6 +23,16 @@ import SectionHeading from "@/components/ui/SectionHeading";
 // ---------------------------------------------------------------------------
 
 type AttendanceChoice = "present" | "absent" | "";
+type ParticipantType = "adult" | "child";
+
+interface Participant {
+  id: string;
+  type: ParticipantType;
+  firstName: string;
+  lastName: string;
+  age: string; // uniquement pertinent pour les enfants
+  allergies: string;
+}
 
 interface FormState {
   fullName: string;
@@ -22,17 +40,22 @@ interface FormState {
   phone: string;
   adultsCount: string;
   childrenCount: string;
-  participantNames: string;
-  childrenAges: string;
+  participants: Participant[];
   comments: string;
   attendance: AttendanceChoice;
 }
 
 type SubmitStatus = "idle" | "loading" | "success" | "error";
 
+// Une "phase" regroupe un ou plusieurs écrans. La phase "participants"
+// contient plusieurs sous-écrans (un par personne), pilotés par participantIndex.
+type Phase = "info" | "counts" | "participants" | "comments";
+
 // ---------------------------------------------------------------------------
-// Valeurs initiales du formulaire
+// Constantes / helpers
 // ---------------------------------------------------------------------------
+
+const MAX_PARTICIPANTS_PER_TYPE = 15;
 
 const INITIAL_FORM: FormState = {
   fullName: "",
@@ -40,11 +63,59 @@ const INITIAL_FORM: FormState = {
   phone: "",
   adultsCount: "",
   childrenCount: "",
-  participantNames: "",
-  childrenAges: "",
+  participants: [],
   comments: "",
   attendance: "",
 };
+
+function createParticipant(type: ParticipantType): Participant {
+  return {
+    id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    type,
+    firstName: "",
+    lastName: "",
+    age: "",
+    allergies: "",
+  };
+}
+
+// Reconstruit la liste des participants à partir des compteurs, en
+// préservant les infos déjà saisies si l'utilisateur revient modifier les nombres.
+function syncParticipants(
+  adultsCount: string,
+  childrenCount: string,
+  existing: Participant[]
+): Participant[] {
+  const adults = Math.min(
+    Math.max(parseInt(adultsCount || "0", 10) || 0, 0),
+    MAX_PARTICIPANTS_PER_TYPE
+  );
+  const children = Math.min(
+    Math.max(parseInt(childrenCount || "0", 10) || 0, 0),
+    MAX_PARTICIPANTS_PER_TYPE
+  );
+
+  const existingAdults = existing.filter((p) => p.type === "adult");
+  const existingChildren = existing.filter((p) => p.type === "child");
+
+  const nextAdults = Array.from(
+    { length: adults },
+    (_, i) => existingAdults[i] ?? createParticipant("adult")
+  );
+  const nextChildren = Array.from(
+    { length: children },
+    (_, i) => existingChildren[i] ?? createParticipant("child")
+  );
+
+  return [...nextAdults, ...nextChildren];
+}
+
+function participantLabel(participants: Participant[], index: number): string {
+  const p = participants[index];
+  if (!p) return "";
+  const sameTypeBefore = participants.slice(0, index).filter((x) => x.type === p.type).length;
+  return `${p.type === "adult" ? "Adulte" : "Enfant"} ${sameTypeBefore + 1}`;
+}
 
 // ---------------------------------------------------------------------------
 // Sous-composant : champ de saisie
@@ -53,10 +124,11 @@ const INITIAL_FORM: FormState = {
 interface FieldProps {
   label: string;
   required?: boolean;
+  hint?: string;
   children: React.ReactNode;
 }
 
-function Field({ label, required = false, children }: FieldProps) {
+function Field({ label, required = false, hint, children }: FieldProps) {
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-sm font-semibold text-brand-navy">
@@ -64,6 +136,7 @@ function Field({ label, required = false, children }: FieldProps) {
         {required && <span className="text-rose-500 ml-1">*</span>}
       </label>
       {children}
+      {hint && <p className="text-xs text-brand-gray/70">{hint}</p>}
     </div>
   );
 }
@@ -107,7 +180,8 @@ export default function Registration() {
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [status, setStatus] = useState<SubmitStatus>("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [step, setStep] = useState(1);
+  const [phase, setPhase] = useState<Phase>("info");
+  const [participantIndex, setParticipantIndex] = useState(0);
   const [direction, setDirection] = useState<"next" | "back">("next");
 
   function handleChange(
@@ -117,32 +191,115 @@ export default function Registration() {
     setForm((prev) => ({ ...prev, [name]: value }));
   }
 
+  function handleParticipantChange(
+    index: number,
+    field: "firstName" | "lastName" | "age" | "allergies",
+    value: string
+  ) {
+    setForm((prev) => {
+      const next = [...prev.participants];
+      next[index] = { ...next[index], [field]: value };
+      return { ...prev, participants: next };
+    });
+  }
+
   function handleAttendance(value: AttendanceChoice) {
     setForm((prev) => ({ ...prev, attendance: value }));
   }
 
+  // -------------------------------------------------------------------
+  // Validation par écran
+  // -------------------------------------------------------------------
+
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
+  const isInfoValid =
+    form.fullName.trim() !== "" &&
+    form.email.trim() !== "" &&
+    isEmailValid &&
+    form.attendance !== "";
+
+  const totalPeopleAnnounced =
+    (parseInt(form.adultsCount || "0", 10) || 0) +
+    (parseInt(form.childrenCount || "0", 10) || 0);
+  const isCountsValid = totalPeopleAnnounced >= 1;
+
+  const currentParticipant = form.participants[participantIndex];
+  const isCurrentParticipantValid = currentParticipant
+    ? currentParticipant.firstName.trim() !== "" &&
+      currentParticipant.lastName.trim() !== "" &&
+      (currentParticipant.type === "adult" || currentParticipant.age.trim() !== "")
+    : true;
+
+  // -------------------------------------------------------------------
+  // Navigation
+  // -------------------------------------------------------------------
+
   function handleNext() {
-    if (step === 1 && isStep1Valid) {
-      setDirection("next");
-      if (form.attendance === "absent") {
-        setStep(3);
-      } else {
-        setStep(2);
+    setDirection("next");
+
+    if (phase === "info") {
+      if (!isInfoValid) return;
+      setPhase(form.attendance === "absent" ? "comments" : "counts");
+      return;
+    }
+
+    if (phase === "counts") {
+      if (!isCountsValid) return;
+      const nextParticipants = syncParticipants(
+        form.adultsCount,
+        form.childrenCount,
+        form.participants
+      );
+      setForm((prev) => ({ ...prev, participants: nextParticipants }));
+      if (nextParticipants.length === 0) {
+        setPhase("comments");
+        return;
       }
-    } else if (step === 2) {
-      setDirection("next");
-      setStep(3);
+      setParticipantIndex(0);
+      setPhase("participants");
+      return;
+    }
+
+    if (phase === "participants") {
+      if (!isCurrentParticipantValid) return;
+      if (participantIndex < form.participants.length - 1) {
+        setParticipantIndex((i) => i + 1);
+      } else {
+        setPhase("comments");
+      }
+      return;
     }
   }
 
   function handleBack() {
     setDirection("back");
-    if (step === 3 && form.attendance === "absent") {
-      setStep(1);
-    } else if (step === 3) {
-      setStep(2);
-    } else if (step === 2) {
-      setStep(1);
+
+    if (phase === "comments") {
+      if (form.attendance === "absent") {
+        setPhase("info");
+        return;
+      }
+      if (form.participants.length > 0) {
+        setParticipantIndex(form.participants.length - 1);
+        setPhase("participants");
+      } else {
+        setPhase("counts");
+      }
+      return;
+    }
+
+    if (phase === "participants") {
+      if (participantIndex > 0) {
+        setParticipantIndex((i) => i - 1);
+      } else {
+        setPhase("counts");
+      }
+      return;
+    }
+
+    if (phase === "counts") {
+      setPhase("info");
+      return;
     }
   }
 
@@ -176,33 +333,37 @@ export default function Registration() {
     }
   }
 
-  // Validation
-  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
-  const isStep1Valid =
-    form.fullName.trim() !== "" &&
-    form.email.trim() !== "" &&
-    isEmailValid &&
-    form.attendance !== "";
+  // -------------------------------------------------------------------
+  // Progression / titres d'écran
+  // -------------------------------------------------------------------
 
-  // Dynamic step titles and progress calculations
-  const totalSteps = form.attendance === "absent" ? 2 : 3;
-  let currentStepDisplay = 1;
-  let progressWidth = "33.33%";
+  const isAbsent = form.attendance === "absent";
+  // Ecrans : info(1) + counts(1) + participants(N) + comments(1)
+  const totalScreens = isAbsent ? 2 : 3 + form.participants.length;
+
+  let currentScreen = 1;
   let stepTitle = "";
 
-  if (step === 1) {
-    currentStepDisplay = 1;
-    progressWidth = totalSteps === 2 ? "50%" : "33.33%";
+  if (phase === "info") {
+    currentScreen = 1;
     stepTitle = "Informations personnelles";
-  } else if (step === 2) {
-    currentStepDisplay = 2;
-    progressWidth = "66.66%";
-    stepTitle = "Détails de la participation";
-  } else if (step === 3) {
-    currentStepDisplay = totalSteps;
-    progressWidth = "100%";
+  } else if (phase === "counts") {
+    currentScreen = 2;
+    stepTitle = "Nombre de participants";
+  } else if (phase === "participants") {
+    currentScreen = 3 + participantIndex;
+    stepTitle = participantLabel(form.participants, participantIndex);
+  } else if (phase === "comments") {
+    currentScreen = totalScreens;
     stepTitle = "Remarques & Commentaires";
   }
+
+  const progressWidth = `${Math.min((currentScreen / totalScreens) * 100, 100)}%`;
+
+  const isNextDisabled =
+    (phase === "info" && !isInfoValid) ||
+    (phase === "counts" && !isCountsValid) ||
+    (phase === "participants" && !isCurrentParticipantValid);
 
   return (
     <section id="inscription" className="section-beige py-20">
@@ -238,7 +399,8 @@ export default function Registration() {
                     setForm(INITIAL_FORM);
                     setStatus("idle");
                     setErrorMessage("");
-                    setStep(1);
+                    setPhase("info");
+                    setParticipantIndex(0);
                   }}
                   className="btn-outline px-5 py-2.5 text-sm"
                 >
@@ -252,7 +414,7 @@ export default function Registration() {
                 <div>
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-xs font-bold uppercase tracking-wider text-brand-sky">
-                      Étape {currentStepDisplay} sur {totalSteps}
+                      Étape {currentScreen} sur {totalScreens}
                     </span>
                     <span className="text-sm font-semibold text-brand-navy">
                       {stepTitle}
@@ -270,7 +432,7 @@ export default function Registration() {
                 <div className="grow">
                   <AnimatePresence mode="wait" custom={direction}>
                     <motion.div
-                      key={step}
+                      key={phase === "participants" ? `participant-${participantIndex}` : phase}
                       custom={direction}
                       variants={stepVariants}
                       initial="enter"
@@ -278,7 +440,7 @@ export default function Registration() {
                       exit="exit"
                       className="flex flex-col gap-5"
                     >
-                      {step === 1 && (
+                      {phase === "info" && (
                         <>
                           {/* Choix de présence */}
                           <Field label="Votre présence" required>
@@ -374,23 +536,22 @@ export default function Registration() {
                         </>
                       )}
 
-                      {step === 2 && form.attendance === "present" && (
+                      {phase === "counts" && (
                         <>
-                          {/* Adultes & Enfants */}
                           <div className="grid grid-cols-2 gap-4">
-                            <Field label="Nombre d'adultes">
+                            <Field label="Nombre d'adultes" required>
                               <input
                                 type="number"
                                 name="adultsCount"
                                 value={form.adultsCount}
                                 onChange={handleChange}
                                 placeholder="Ex : 2"
-                                min="1"
+                                min="0"
                                 className={inputClass}
                               />
                             </Field>
 
-                            <Field label="Nombre d'enfants">
+                            <Field label="Nombre d'enfants" required>
                               <input
                                 type="number"
                                 name="childrenCount"
@@ -402,36 +563,96 @@ export default function Registration() {
                               />
                             </Field>
                           </div>
+                          <p className="text-xs text-brand-gray/70 -mt-2">
+                            À l&apos;étape suivante, nous vous demanderons le prénom, le nom
+                            {" "}et quelques informations pour chaque personne.
+                          </p>
+                        </>
+                      )}
 
-                          {/* Noms des participants */}
-                          <Field label="Noms des participants">
-                            <textarea
-                              name="participantNames"
-                              value={form.participantNames}
-                              onChange={handleChange}
-                              placeholder="Ex : Jean Dupont, Marie Dupont, Lucas (8 ans)..."
-                              rows={3}
-                              className={textareaClass}
-                            />
-                          </Field>
+                      {phase === "participants" && currentParticipant && (
+                        <div className="rounded-xl border border-brand-border bg-brand-gray-light/40 p-5 flex flex-col gap-4">
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={[
+                                "w-9 h-9 rounded-full flex items-center justify-center shrink-0",
+                                currentParticipant.type === "adult"
+                                  ? "bg-brand-purple-soft text-brand-purple"
+                                  : "bg-amber-50 text-amber-600",
+                              ].join(" ")}
+                            >
+                              {currentParticipant.type === "adult" ? (
+                                <User className="w-4 h-4" />
+                              ) : (
+                                <Baby className="w-4 h-4" />
+                              )}
+                            </span>
+                            <span className="text-sm font-bold text-brand-navy">
+                              {participantLabel(form.participants, participantIndex)}
+                            </span>
+                          </div>
 
-                          {/* Âges des enfants */}
-                          <Field label="Âges des enfants">
+                          <div className="grid sm:grid-cols-2 gap-4">
+                            <Field label="Prénom" required>
+                              <input
+                                type="text"
+                                value={currentParticipant.firstName}
+                                onChange={(e) =>
+                                  handleParticipantChange(participantIndex, "firstName", e.target.value)
+                                }
+                                placeholder="Prénom"
+                                className={inputClass}
+                              />
+                            </Field>
+
+                            <Field label="Nom" required>
+                              <input
+                                type="text"
+                                value={currentParticipant.lastName}
+                                onChange={(e) =>
+                                  handleParticipantChange(participantIndex, "lastName", e.target.value)
+                                }
+                                placeholder="Nom"
+                                className={inputClass}
+                              />
+                            </Field>
+                          </div>
+
+                          {currentParticipant.type === "child" && (
+                            <Field label="Âge" required>
+                              <input
+                                type="number"
+                                min="0"
+                                value={currentParticipant.age}
+                                onChange={(e) =>
+                                  handleParticipantChange(participantIndex, "age", e.target.value)
+                                }
+                                placeholder="Ex : 8"
+                                className={inputClass}
+                              />
+                            </Field>
+                          )}
+
+                          <Field
+                            label="Allergies ou informations complémentaires"
+                            hint="Optionnel - indiquez « Aucune » si rien à signaler"
+                          >
                             <textarea
-                              name="childrenAges"
-                              value={form.childrenAges}
-                              onChange={handleChange}
-                              placeholder="Ex : Lucas 8 ans, Emma 5 ans, Noah 3 ans..."
+                              value={currentParticipant.allergies}
+                              onChange={(e) =>
+                                handleParticipantChange(participantIndex, "allergies", e.target.value)
+                              }
+                              placeholder="Ex : Allergie aux arachides, régime végétarien..."
                               rows={2}
                               className={textareaClass}
                             />
                           </Field>
-                        </>
+                        </div>
                       )}
 
-                      {step === 3 && (
+                      {phase === "comments" && (
                         <>
-                          {form.attendance === "absent" && (
+                          {isAbsent && (
                             <div className="bg-brand-gray-light/50 border border-brand-border rounded-xl p-4 text-sm text-brand-gray">
                               <p className="leading-relaxed">
                                 Puisque vous ne pouvez pas assister, vous pouvez laisser un message ou une remarque ci-dessous à l&apos;intention des organisateurs si vous le souhaitez.
@@ -439,13 +660,16 @@ export default function Registration() {
                             </div>
                           )}
 
-                          {/* Commentaires */}
-                          <Field label="Commentaires ou questions">
+                          {/* Commentaires globaux */}
+                          <Field
+                            label="Informations complémentaires générales"
+                            hint="Ex : besoins d'accessibilité, questions logistiques, précisions sur votre arrivée..."
+                          >
                             <textarea
                               name="comments"
                               value={form.comments}
                               onChange={handleChange}
-                              placeholder="Besoins particuliers, questions, informations supplémentaires..."
+                              placeholder="Toute autre information utile pour les organisateurs..."
                               rows={5}
                               className={textareaClass}
                             />
@@ -467,9 +691,9 @@ export default function Registration() {
                   )}
 
                   <div className="flex justify-between items-center gap-4">
-                    {step < 3 ? (
+                    {phase !== "comments" ? (
                       <>
-                        {step > 1 && (
+                        {phase !== "info" && (
                           <button
                             type="button"
                             onClick={handleBack}
@@ -482,7 +706,7 @@ export default function Registration() {
                         <button
                           type="button"
                           onClick={handleNext}
-                          disabled={step === 1 && !isStep1Valid}
+                          disabled={isNextDisabled}
                           className="btn-primary w-full sm:w-auto ml-auto px-6 py-3 text-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           Suivant
@@ -549,7 +773,7 @@ export default function Registration() {
                 <div className="flex flex-col gap-1">
                   <h4 className="text-sm font-bold text-brand-navy">Informations importantes</h4>
                   <p className="text-brand-gray text-xs sm:text-sm leading-relaxed">
-                    L&apos;événement se déroulera de 8h à 16h précises. Veuillez indiquer le nombre de personnes (conjoint, conjointe et enfants) ainsi que les noms de chaque participant et l&apos;âge des enfants.
+                    L&apos;événement se déroulera de 8h à 16h précises. Nous vous guiderons pas à pas pour renseigner le prénom, le nom, etpour les enfants l&apos;âge de chaque participant, ainsi que toute allergie à signaler.
                   </p>
                 </div>
               </div>
