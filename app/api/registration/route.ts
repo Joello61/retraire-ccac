@@ -1,11 +1,15 @@
 // app/api/registration/route.ts
-// Route API Next.js pour traiter les inscriptions et envoyer les emails via Mailjet
+// Route API Next.js pour traiter les inscriptions, enregistrer chaque
+// inscription dans Google Sheets (registre officiel) puis envoyer les
+// emails de notification via Mailjet.
 
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { Client, SendEmailV3_1, LibraryResponse } from "node-mailjet";
 import { render } from "@react-email/render";
 import RegistrationAdmin from "@/components/emails/RegistrationAdmin";
 import RegistrationConfirmation from "@/components/emails/RegistrationConfirmation";
+import { appendRegistrationToSheet } from "@/lib/googleSheets";
 
 //-------------------------------------------------------------------------
 // Types
@@ -73,10 +77,32 @@ const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT_MAX_REQUESTS = 5;
 const MAX_PARTICIPANTS = 30; // garde-fou anti-abus
 
+// Garde-fou mémoire: sans nettoyage, cette Map grossit indéfiniment avec le
+// nombre d'IP uniques vues (chaque visiteur ajoute une entrée qui ne
+// disparaît jamais). Pour un événement à trafic limité ce n'est pas
+// critique, mais on évite une fuite mémoire long terme sur une instance
+// serverless qui resterait chaude longtemps.
+const MAX_TRACKED_IPS = 5000;
 const requestLog = new Map<string, number[]>();
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
+
+  // Nettoyage best-effort si la Map devient trop grosse: on retire les
+  // entrées dont toutes les requêtes sont hors fenêtre. Simple et suffisant
+  // pour ce volume de trafic; pour une protection multi-instance robuste,
+  // migrer vers Upstash Redis / Vercel KV.
+  if (requestLog.size > MAX_TRACKED_IPS) {
+    for (const [key, timestamps] of requestLog) {
+      const stillValid = timestamps.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+      if (stillValid.length === 0) {
+        requestLog.delete(key);
+      } else {
+        requestLog.set(key, stillValid);
+      }
+    }
+  }
+
   const timestamps = (requestLog.get(ip) ?? []).filter(
     (t) => now - t < RATE_LIMIT_WINDOW_MS
   );
@@ -102,6 +128,10 @@ function getClientIp(request: NextRequest): string {
 //-------------------------------------------------------------------------
 // Validation
 //-------------------------------------------------------------------------
+// Note: cette validation manuelle fonctionne mais reste verbeuse. Pour ce
+// projet, migrer vers Zod (npm install zod) réduirait sensiblement le code
+// ci-dessous et donnerait des types inférés automatiquement — à envisager
+// comme prochaine itération plutôt qu'un changement risqué à insérer ici.
 
 function isValidEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -115,6 +145,15 @@ function parseCount(value: unknown): number | undefined {
   if (typeof value !== "string" || value.trim() === "") return undefined;
   const n = Number(value);
   return Number.isFinite(n) && n >= 0 ? n : undefined;
+}
+
+// Normalise un âge reçu en string ("8") ou en number (8) vers une string.
+// Le formulaire front peut envoyer l'un ou l'autre selon l'implémentation
+// du champ; on ne veut pas rejeter une inscription valide pour ça.
+function normalizeAge(value: unknown): string | undefined {
+  if (typeof value === "string" && value.trim() !== "") return value.trim();
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  return undefined;
 }
 
 function validateParticipants(
@@ -149,7 +188,9 @@ function validateParticipants(
     if (typeof p.lastName !== "string" || p.lastName.trim() === "") {
       return { valid: false, error: "Le nom d'un participant est requis." };
     }
-    if (p.type === "child" && (typeof p.age !== "string" || p.age.trim() === "")) {
+
+    const age = normalizeAge(p.age);
+    if (p.type === "child" && !age) {
       return { valid: false, error: "L'age est requis pour chaque enfant." };
     }
 
@@ -157,7 +198,7 @@ function validateParticipants(
       type: p.type,
       firstName: p.firstName.trim(),
       lastName: p.lastName.trim(),
-      age: typeof p.age === "string" && p.age.trim() !== "" ? p.age.trim() : undefined,
+      age,
       allergies: typeof p.allergies === "string" && p.allergies.trim() !== "" ? p.allergies.trim() : undefined,
     });
   }
@@ -246,12 +287,17 @@ function buildConfirmationText(data: RegistrationPayload): string {
   return lines.join("\n");
 }
 
-function buildAdminText(data: RegistrationPayload, submittedAt: string): string {
+function buildAdminText(
+  data: RegistrationPayload,
+  submittedAt: string,
+  registrationId: string
+): string {
   const adults = data.participants.filter((p) => p.type === "adult");
   const children = data.participants.filter((p) => p.type === "child");
 
   const lines = [
     `Nouvelle reponse recue le ${submittedAt}.`,
+    `ID d'inscription: ${registrationId}`,
     "",
     `Nom: ${data.fullName}`,
     `Email: ${data.email}`,
@@ -309,6 +355,54 @@ export async function POST(request: NextRequest) {
   const data = validation.data;
   const submittedAt = new Date().toISOString();
 
+  // Un seul ID par inscription, réutilisé dans le Sheet et les deux emails.
+  // Ça permet de recouper une ligne du registre avec les emails envoyés
+  // pour la même soumission (support, doublons, corrections).
+  const registrationId = randomUUID();
+
+  // ---------------------------------------------------------------------
+  // 1) Google Sheets d'abord: c'est le registre officiel des participants.
+  // ---------------------------------------------------------------------
+  // Si l'écriture échoue, on bloque l'inscription plutôt que d'envoyer des
+  // emails de confirmation pour une personne absente du registre. C'est
+  // l'inverse du comportement précédent (emails "faisant foi"): un email
+  // envoyé sans ligne dans le Sheet est plus difficile à rattraper qu'un
+  // email en retard pour une inscription déjà enregistrée.
+  const sheetResult = await appendRegistrationToSheet(
+    {
+      fullName: data.fullName,
+      email: data.email,
+      phone: data.phone,
+      attendance: data.attendance,
+      participants: data.participants,
+      comments: data.comments,
+      adultsCount: data.adultsCount,
+      childrenCount: data.childrenCount,
+    },
+    submittedAt,
+    registrationId
+  );
+
+  if (!sheetResult.success) {
+    console.error(
+      `[registration] Echec critique: inscription non enregistree dans le Sheet pour ${data.fullName} (${data.email}). Raison: ${sheetResult.error}`
+    );
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Impossible d'enregistrer votre inscription pour le moment. Merci de reessayer dans quelques instants.",
+      },
+      { status: 502 }
+    );
+  }
+
+  // ---------------------------------------------------------------------
+  // 2) Emails de notification (best-effort). L'inscription est déjà
+  //    enregistrée à ce stade: un échec d'envoi n'annule pas l'inscription,
+  //    on informe simplement l'utilisateur que le mail de confirmation
+  //    pourrait tarder.
+  // ---------------------------------------------------------------------
+
   // Les composants email attendent adultsCount/childrenCount en string
   // (props d'affichage), alors que RegistrationPayload les garde en number
   // pour la validation. On convertit uniquement au moment du rendu.
@@ -318,7 +412,6 @@ export async function POST(request: NextRequest) {
     childrenCount: data.childrenCount !== undefined ? String(data.childrenCount) : undefined,
   };
 
-  // Render emails
   const [adminHtml, confirmationHtml] = await Promise.all([
     render(
       RegistrationAdmin({
@@ -333,7 +426,6 @@ export async function POST(request: NextRequest) {
     ),
   ]);
 
-  // Subjects
   const adminSubject =
     data.attendance === "present"
       ? `Nouvelle inscription - ${data.fullName}`
@@ -344,7 +436,6 @@ export async function POST(request: NextRequest) {
       ? "Votre inscription a la Retraite des Couples CCAC est confirmee"
       : "Nous avons bien recu votre reponse - Retraite des Couples CCAC";
 
-  // Send emails via Mailjet
   const emailBody: SendEmailV3_1.Body = {
     Messages: [
       {
@@ -353,7 +444,7 @@ export async function POST(request: NextRequest) {
         ReplyTo: { Email: data.email, Name: data.fullName },
         Subject: adminSubject,
         HTMLPart: adminHtml,
-        TextPart: buildAdminText(data, submittedAt),
+        TextPart: buildAdminText(data, submittedAt, registrationId),
       },
       {
         From: { Email: FROM_EMAIL, Name: FROM_NAME },
@@ -381,22 +472,38 @@ export async function POST(request: NextRequest) {
     const failedMessages = results.filter((m) => m.Status !== "success");
 
     if (failedMessages.length > 0) {
-      console.error("[registration] Mailjet statut partiel:", JSON.stringify(results));
+      console.error(
+        `[registration] Inscription ${registrationId} enregistree mais statut Mailjet partiel:`,
+        JSON.stringify(results)
+      );
+      // L'inscription est deja actee dans le Sheet: on ne fait pas echouer
+      // la requete pour l'utilisateur, mais on le previent que le mail
+      // peut tarder plutot que de lui promettre une confirmation envoyee.
       return NextResponse.json(
         {
-          success: false,
-          message: "Certains emails n'ont pas pu etre envoyes. Merci de reessayer.",
+          success: true,
+          message:
+            "Votre inscription a bien ete enregistree. L'email de confirmation pourrait toutefois prendre quelques minutes a arriver.",
         },
-        { status: 502 }
+        { status: 200 }
       );
     }
 
-    console.info(`[registration] Inscription enregistree: ${data.fullName} (${data.email})`);
+    console.info(
+      `[registration] Inscription ${registrationId} enregistree et emails envoyes: ${data.fullName} (${data.email})`
+    );
   } catch (err: unknown) {
-    console.error("[registration] Mailjet error:", err instanceof Error ? err.message : err);
+    console.error(
+      `[registration] Inscription ${registrationId} enregistree mais erreur Mailjet:`,
+      err instanceof Error ? err.message : err
+    );
     return NextResponse.json(
-      { success: false, message: "Une erreur est survenue lors de l'envoi des emails." },
-      { status: 500 }
+      {
+        success: true,
+        message:
+          "Votre inscription a bien ete enregistree. L'email de confirmation pourrait toutefois prendre quelques minutes a arriver.",
+      },
+      { status: 200 }
     );
   }
 

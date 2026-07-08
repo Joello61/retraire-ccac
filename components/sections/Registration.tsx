@@ -204,8 +204,14 @@ export default function Registration() {
   }
 
   function handleAttendance(value: AttendanceChoice) {
-    setForm((prev) => ({ ...prev, attendance: value }));
-  }
+  setForm((prev) => ({
+    ...prev,
+    attendance: value,
+    ...(value === "absent"
+      ? { adultsCount: "", childrenCount: "", participants: [] }
+      : {}),
+  }));
+}
 
   // -------------------------------------------------------------------
   // Validation par écran
