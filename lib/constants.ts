@@ -10,17 +10,10 @@ import {
   Baby,
   UtensilsCrossed,
   Flame,
-  Home,
-  Mic,
-  Utensils,
-  Star,
   Mail,
   Phone,
-  DoorOpen,
+  Sunrise,
   Handshake,
-  Sparkles,
-  MessagesSquare,
-  Gift,
   type LucideIcon,
 } from "lucide-react";
 
@@ -122,99 +115,62 @@ export const EXPECTATION_CARDS: ExpectationCard[] = [
 // Programme de la journee (timeline)
 // ---------------------------------------------------------------------------
 
-export interface ScheduleItem {
-  icon: LucideIcon;
+export interface ScheduleSubItem {
   time: string;
   title: string;
   description?: string;
-  accentClass: string;
 }
 
-export const SCHEDULE_ITEMS: ScheduleItem[] = [
+export interface ScheduleChapter {
+  icon: LucideIcon;
+  label: string;
+  items: ScheduleSubItem[];
+  /** Le chapitre "Enseignement" reçoit un traitement visuel distinct (temps fort de la journée) */
+  highlight?: boolean;
+}
+
+export const SCHEDULE_CHAPTERS: ScheduleChapter[] = [
   {
-    icon: DoorOpen,
-    time: "8h00 - 9h00",
-    title: "Arrivée et installation des couples",
-    accentClass: "bg-brand-purple",
-  },
-  {
-    icon: Music,
-    time: "9h00 - 9h45",
-    title: "Adoration, louange et prière",
-    accentClass: "bg-brand-sky",
-  },
-  {
-    icon: Handshake,
-    time: "9h45 - 10h30",
-    title: "Mot de bienvenue",
-    description:
-      "Présentation du CCAC, présentation des couples, lecture du programme",
-    accentClass: "bg-brand-gold",
+    icon: Sunrise,
+    label: "Matin",
+    items: [
+      { time: "8h00", title: "Accueil des couples" },
+      { time: "9h00", title: "Louange et prière" },
+      { time: "9h45", title: "Mot de bienvenue" },
+      { time: "10h30", title: "Méditation", description: "Josué 24:14-18" },
+      { time: "11h00", title: "Louange" },
+    ],
   },
   {
     icon: BookOpen,
-    time: "10h30 - 11h00",
-    title: "Méditation",
-    description: "Josué 24:14-18",
-    accentClass: "bg-rose-500",
+    label: "Enseignement",
+    highlight: true,
+    items: [
+      {
+        time: "11h30 – 13h30",
+        title: "Moi et ma famille nous servirons l'Éternel",
+        description: "Josué 24:14-15",
+      },
+    ],
   },
   {
-    icon: Music,
-    time: "11h00 - 11h30",
-    title: "Louange et adoration",
-    accentClass: "bg-brand-sky",
+    icon: Handshake,
+    label: "Après-midi",
+    items: [
+      { time: "13h30", title: "Réflexion personnelle" },
+      { time: "14h00", title: "Échanges en groupe" },
+      { time: "15h00", title: "Atelier en duo" },
+      { time: "15h30", title: "Jeux et cadeaux" },
+      { time: "16h30", title: "Intercession" },
+    ],
   },
   {
-    icon: Mic,
-    time: "11h30 - 13h30",
-    title: "Enseignement",
-    description:
-      "Moi et ma famille nous servirons l'Éternel - Josué 24:14-15",
-    accentClass: "bg-brand-gold",
-  },
-  {
-    icon: Sparkles,
-    time: "13h30 - 14h00",
-    title: "Moment de prière et réflexion individuel",
-    description: "En lien avec le thème, à la suite de l'enseignement",
-    accentClass: "bg-brand-purple",
-  },
-  {
-    icon: MessagesSquare,
-    time: "14h00 - 15h00",
-    title: "Discussion et échange en grand groupe",
-    accentClass: "bg-emerald-600",
-  },
-  {
-    icon: Heart,
-    time: "15h00 - 15h30",
-    title: "Atelier en duo de couples",
-    description: "Un couple CCAC + un couple invité",
-    accentClass: "bg-rose-500",
-  },
-  {
-    icon: Gift,
-    time: "15h30 - 16h30",
-    title: "Jeux de couples et cadeaux",
-    accentClass: "bg-brand-gold",
-  },
-  {
-    icon: HandHeart,
-    time: "16h30 - 17h00",
-    title: "Intercession",
-    accentClass: "bg-brand-purple",
-  },
-  {
-    icon: Utensils,
-    time: "17h00 - 17h30",
-    title: "Partage repas",
-    accentClass: "bg-emerald-600",
-  },
-  {
-    icon: Home,
-    time: "17h30 - 18h00",
-    title: "Nettoyage des lieux, prière et retour à domicile",
-    accentClass: "bg-brand-sky",
+    icon: UtensilsCrossed,
+    label: "Clôture",
+    items: [
+      { time: "17h00", title: "Partage repas" },
+      { time: "17h30", title: "Nettoyage, prière et retour à domicile" },
+    ],
   },
 ];
 
