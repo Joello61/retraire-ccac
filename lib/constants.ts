@@ -16,6 +16,11 @@ import {
   Star,
   Mail,
   Phone,
+  DoorOpen,
+  Handshake,
+  Sparkles,
+  MessagesSquare,
+  Gift,
   type LucideIcon,
 } from "lucide-react";
 
@@ -28,7 +33,7 @@ export const EVENT_INFO = {
   subtitle: "Couples Chrétiens & Amis au Canada",
   tagline: "Un temps de ressourcement, de prière et de renouveau pour les couples et leurs familles.",
   date: "Sam 15 août 2026",
-  schedule: "8h00 à 16h00",
+  schedule: "8h00 à 18h00",
   isFree: true,
   freeBadge: "Participation gratuite",
   slogan: "Un couple solide, une famille équilibrée.",
@@ -127,32 +132,71 @@ export interface ScheduleItem {
 
 export const SCHEDULE_ITEMS: ScheduleItem[] = [
   {
-    icon: Home,
-    time: "8h00 - 10h30",
-    title: "Accueil & Salutations",
-    description: "Adoration, prière & mot de bienvenue",
+    icon: DoorOpen,
+    time: "8h00 - 9h00",
+    title: "Arrivée et installation des couples",
     accentClass: "bg-brand-purple",
+  },
+  {
+    icon: Music,
+    time: "9h00 - 9h45",
+    title: "Adoration, louange et prière",
+    accentClass: "bg-brand-sky",
+  },
+  {
+    icon: Handshake,
+    time: "9h45 - 10h30",
+    title: "Mot de bienvenue",
+    description:
+      "Présentation du CCAC, présentation des couples, lecture du programme",
+    accentClass: "bg-brand-gold",
   },
   {
     icon: BookOpen,
     time: "10h30 - 11h00",
-    title: "Méditation biblique",
-    description: "Moment d'étude et d'échange biblique",
+    title: "Méditation",
+    description: "Josué 24:14-18",
+    accentClass: "bg-rose-500",
+  },
+  {
+    icon: Music,
+    time: "11h00 - 11h30",
+    title: "Louange et adoration",
     accentClass: "bg-brand-sky",
   },
   {
     icon: Mic,
-    time: "11h30 - 15h00",
+    time: "11h30 - 13h30",
     title: "Enseignement",
     description:
-      "Partage autour de la thématique de la retraite : Moi et ma famille nous servirons l'Éternel",
+      "Moi et ma famille nous servirons l'Éternel - Josué 24:14-15",
     accentClass: "bg-brand-gold",
   },
   {
+    icon: Sparkles,
+    time: "13h30 - 14h00",
+    title: "Moment de prière et réflexion individuel",
+    description: "En lien avec le thème, à la suite de l'enseignement",
+    accentClass: "bg-brand-purple",
+  },
+  {
+    icon: MessagesSquare,
+    time: "14h00 - 15h00",
+    title: "Discussion et échange en grand groupe",
+    accentClass: "bg-emerald-600",
+  },
+  {
     icon: Heart,
-    time: "15h30 - 16h30",
+    time: "15h00 - 15h30",
     title: "Atelier en duo de couples",
+    description: "Un couple CCAC + un couple invité",
     accentClass: "bg-rose-500",
+  },
+  {
+    icon: Gift,
+    time: "15h30 - 16h30",
+    title: "Jeux de couples et cadeaux",
+    accentClass: "bg-brand-gold",
   },
   {
     icon: HandHeart,
@@ -163,13 +207,13 @@ export const SCHEDULE_ITEMS: ScheduleItem[] = [
   {
     icon: Utensils,
     time: "17h00 - 17h30",
-    title: "Partage de repas",
+    title: "Partage repas",
     accentClass: "bg-emerald-600",
   },
   {
-    icon: Star,
+    icon: Home,
     time: "17h30 - 18h00",
-    title: "Conclusion & prières",
+    title: "Nettoyage des lieux, prière et retour à domicile",
     accentClass: "bg-brand-sky",
   },
 ];

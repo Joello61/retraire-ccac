@@ -779,7 +779,7 @@ export default function Registration() {
                 <div className="flex flex-col gap-1">
                   <h4 className="text-sm font-bold text-brand-navy">Informations importantes</h4>
                   <p className="text-brand-gray text-xs sm:text-sm leading-relaxed">
-                    L&apos;événement se déroulera de 8h à 16h précises. Nous vous guiderons pas à pas pour renseigner le prénom, le nom, etpour les enfants l&apos;âge de chaque participant, ainsi que toute allergie à signaler.
+                    L&apos;événement se déroulera de 8h à 18h précises. Nous vous guiderons pas à pas pour renseigner le prénom, le nom, etpour les enfants l&apos;âge de chaque participant, ainsi que toute allergie à signaler.
                   </p>
                 </div>
               </div>

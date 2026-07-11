@@ -188,7 +188,7 @@ export default function RegistrationConfirmation({
                 <Row style={{ marginBottom: 14 }}>
                   <Column>
                     <Text style={infoItemTitle}>Date et horaire</Text>
-                    <Text style={infoItemBody}>De 8h00 à 16h00 précises</Text>
+                    <Text style={infoItemBody}>De 8h00 à 18h00 précises</Text>
                   </Column>
                 </Row>
 
